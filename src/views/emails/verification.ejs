@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xác thực tài khoản</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #f5f5f5;
+      line-height: 1.6;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      background: #7c3aed;
+      padding: 40px 20px;
+      text-align: center;
+      color: white;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      font-size: 40px;
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      text-align: center;
+      line-height: 76px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .content {
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .greeting {
+      font-size: 18px;
+      color: #374151;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .message {
+      font-size: 16px;
+      color: #6b7280;
+      margin-bottom: 30px;
+      line-height: 1.7;
+    }
+
+    .verification-code {
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      border-radius: 12px;
+      padding: 30px;
+      margin: 30px 0;
+      border: 2px dashed #d1d5db;
+    }
+
+    .code-label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+
+    .code-display {
+      font-size: 32px;
+      font-weight: 700;
+      color: #4f46e5;
+      letter-spacing: 8px;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 20px;
+    }
+
+    .verify-button {
+      display: inline-block;
+      background: #7c3aed !important;
+      color: white !important;
+      padding: 16px 40px;
+      text-decoration: none;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 20px 0;
+      border: none;
+      cursor: pointer;
+    }
+
+    .alternative-text {
+      font-size: 14px;
+      color: #9ca3af;
+      margin: 25px 0;
+    }
+
+    .link-text {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 12px;
+      color: #6b7280;
+      word-break: break-all;
+      margin: 15px 0;
+    }
+
+    .warning {
+      background: #fef3c7;
+      border: 1px solid #fbbf24;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 30px 0;
+      color: #92400e;
+    }
+
+    .warning-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #b45309;
+    }
+
+    .warning-text {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .footer {
+      background: #f9fafb;
+      padding: 30px;
+      text-align: center;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .footer-text {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 15px;
+    }
+
+    .company-info {
+      font-size: 12px;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    .social-links {
+      margin: 20px 0;
+    }
+
+    .social-links a {
+      display: inline-block;
+      margin: 0 10px;
+      color: #6b7280;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .email-container {
+        margin: 10px;
+        border-radius: 4px;
+      }
+
+      .content {
+        padding: 25px 20px;
+      }
+
+      .header {
+        padding: 30px 20px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .code-display {
+        font-size: 28px;
+        letter-spacing: 4px;
+      }
+
+      .verify-button {
+        padding: 14px 30px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="email-container">
+    <div class="header">
+      <div class="logo">
+        ✓
+      </div>
+      <h1>Xác Thực Tài Khoản</h1>
+    </div>
+
+    <div class="content">
+      <p class="greeting">Chào bạn!</p>
+
+      <p class="message">
+        Cảm ơn bạn đã đăng ký tài khoản. Để hoàn tất quá trình đăng ký và bắt đầu sử dụng dịch vụ,
+        vui lòng xác thực địa chỉ email của bạn bằng cách nhấp vào nút bên dưới.
+      </p>
+
+      <p class="message" style="font-size: 14px; color: #9ca3af; margin-bottom: 35px;">
+        Liên kết xác thực sẽ hết hạn sau 24 giờ kể từ khi gửi email này.
+      </p>
+
+
+
+      <a href="<%= verifyUrl %>" class="verify-button">
+        Xác Thực Tài Khoản
+      </a>
+
+      <p class="alternative-text">
+        Nếu nút không hoạt động, bạn có thể sao chép và dán liên kết sau vào trình duyệt:
+      </p>
+
+      <div class="link-text">
+        <%= verifyUrl %>
+      </div>
+
+      <div class="warning">
+        <div class="warning-title">⚠️ Lưu ý bảo mật</div>
+        <div class="warning-text">
+          Nếu bạn không thực hiện đăng ký này, vui lòng bỏ qua email này.
+          Không chia sẻ liên kết xác thực này với bất kỳ ai.
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p class="footer-text">
+        Bạn nhận được email này vì đã đăng ký tài khoản trên hệ thống của chúng tôi.
+      </p>
+
+      <div class="social-links">
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">Instagram</a>
+      </div>
+
+      <div class="company-info">
+        © 2025 Your Company Name<br>
+        123 Đường ABC, Quận XYZ, Thành phố Hà Nội<br>
+        <a href="#" style="color: #6b7280;">Hủy đăng ký</a> |
+        <a href="#" style="color: #6b7280;">Chính sách bảo mật</a>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

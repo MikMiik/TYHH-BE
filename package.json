@@ -1,0 +1,50 @@
+{
+  "dependencies": {
+    "@faker-js/faker": "^9.9.0",
+    "axios": "^1.11.0",
+    "bcrypt": "^6.0.0",
+    "cls-hooked": "^4.2.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
+    "express-validator": "^7.2.1",
+    "generate-password": "^1.7.1",
+    "google-auth-library": "^10.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "method-override": "^3.0.0",
+    "module-alias": "^2.2.3",
+    "multer": "^2.0.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.14.3",
+    "nodemailer": "^7.0.5",
+    "path-to-regexp": "^8.2.0",
+    "prettier-plugin-ejs": "^1.0.3",
+    "pusher": "^5.2.0",
+    "redis": "^5.8.0",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3",
+    "slugify": "^1.6.6"
+  },
+  "scripts": {
+    "start": "node --watch server.js",
+    "migration:create": "npx sequelize-cli migration:create",
+    "db:migrate": "npx sequelize-cli db:migrate",
+    "db:migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "db:migrate:undo:all": "npx sequelize-cli db:migrate:undo:all",
+    "db:seed": "npx sequelize-cli db:seed",
+    "db:seed:all": "npx sequelize-cli db:seed:all",
+    "db:seed:undo": "npx sequelize-cli db:seed:undo",
+    "db:seed:undo:all": "npx sequelize-cli db:seed:undo:all",
+    "model:generate": "npx sequelize-cli model:generate",
+    "model:create": "npx sequelize-cli model:create",
+    "seed:generate": "npx sequelize-cli seed:generate",
+    "seed:create": "npx sequelize-cli seed:create",
+    "queue": "node --watch ./src/workers/queueWorker.js"
+  },
+  "_moduleAliases": {
+    "@": "src"
+  }
+}
