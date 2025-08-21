@@ -1,6 +1,6 @@
 const transporter = require("@/configs/mailer");
 const loadMail = require("@/utils/loadEmail");
-const { mail } = require("@/configs");
+const mail = require("@/configs/mail");
 
 async function sendForgotPasswordEmailJob(job) {
   const data = JSON.parse(job.payload);

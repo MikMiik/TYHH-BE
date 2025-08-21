@@ -6,8 +6,6 @@ const cors = require("cors");
 const app = express();
 const port = 3000;
 const { sequelize } = require("@/models");
-const { domain } = require("@/configs/domain");
-const path = require("path");
 
 // Redis Import
 const redisClient = require("@/configs/redis");
@@ -28,28 +26,25 @@ const expressLayouts = require("express-ejs-layouts");
 const notFoundHandler = require("@/middlewares/notFoundHandler");
 const errorHandler = require("@/middlewares/errorHandler");
 const responseEnhancer = require("@/middlewares/responseEnhancer");
-const handlePagination = require("@/middlewares/handlePagination");
 const checkAuth = require("@/middlewares/checkAuth");
 const { setContext } = require("@/middlewares/setContext");
 
 /*------------------------------------------------------------ */
 
 // Middleware
-app.use(cors());
+app.use(
+  cors([process.env.CLIENT_URL || "http://localhost:5173"], {
+    credentials: true,
+  })
+);
 app.set("trust proxy", true);
 app.use(express.static("public"));
-app.use(express.static(path.join(__dirname, "public")));
-app.use(
-  "/api/v1/uploads",
-  express.static(path.join(__dirname, "public/uploads"))
-);
 
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(methodOverride("_method"));
 app.use(responseEnhancer);
-app.use(handlePagination);
 
 // ViewEngine
 app.use(expressLayouts);

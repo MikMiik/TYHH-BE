@@ -1,6 +1,6 @@
 const transporter = require("@/configs/mailer");
 const usersService = require("@/services/user.service");
-const { mail } = require("@/configs");
+const mail = require("@/configs/mail");
 const loadMail = require("@/utils/loadEmail");
 
 async function sendVerifyEmailJob(job) {

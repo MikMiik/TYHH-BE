@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const { mail } = require("@/configs");
+const mail = require("@/configs/mail");
 
 const transporter = nodemailer.createTransport({
   service: mail.SERVICE,

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const { mail } = require("@/configs/mail");
-const { auth } = require("@/configs/auth");
+const mail = require("@/configs/mail");
+const auth = require("@/configs/auth");
 
 const generateAccessToken = (userId) => {
   const token = jwt.sign({ userId }, auth.JWT_SECRET, {

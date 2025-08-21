@@ -7,12 +7,14 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
-      firstName: Sequelize.STRING(50),
+      name: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
 
-      lastName: Sequelize.STRING(50),
-
-      email: { type: Sequelize.STRING(50), unique: true },
+      email: { type: Sequelize.STRING(191), unique: true, allowNull: false },
 
       password: {
         type: Sequelize.STRING(255),
@@ -22,40 +24,34 @@ module.exports = {
       username: {
         type: Sequelize.STRING(100),
         unique: true,
+        allowNull: false,
       },
 
-      birthday: Sequelize.DATE,
+      birthday: { type: Sequelize.DATE, allowNull: true },
 
       phone: {
         type: Sequelize.STRING(50),
         unique: true,
+        allowNull: false,
+      },
+
+      city: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
+      },
+
+      school: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
       },
 
       role: {
         type: Sequelize.STRING(191),
-        defaultValue: "User",
+        defaultValue: "user",
       },
+      lastLogin: { type: Sequelize.DATE, allowNull: true },
 
-      status: Sequelize.STRING(50),
-
-      twoFactorAuth: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-
-      twoFactorSecret: Sequelize.STRING(50),
-
-      postsCount: { type: Sequelize.INTEGER, defaultValue: 0 },
-
-      followersCount: { type: Sequelize.INTEGER, defaultValue: 0 },
-
-      followingCount: { type: Sequelize.INTEGER, defaultValue: 0 },
-
-      likesCount: { type: Sequelize.INTEGER, defaultValue: 0 },
-
-      lastLogin: Sequelize.DATE,
-
-      verifiedAt: Sequelize.DATE,
+      verifiedAt: { type: Sequelize.DATE, allowNull: true },
 
       createdAt: {
         allowNull: false,
@@ -65,6 +61,11 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+      },
+
+      deletedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
       },
     });
   },

@@ -1,5 +1,5 @@
 const { RefreshToken } = require("@/models");
-const { auth } = require("@/configs/auth");
+const auth = require("@/configs/auth");
 const { Op } = require("sequelize");
 const generateToken = require("@/utils/generateToken");
 
