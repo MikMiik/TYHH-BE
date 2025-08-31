@@ -2,19 +2,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("socialLinks", {
+    await queryInterface.createTable("socials", {
       id: {
+        type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      platformCode: {
-        type: Sequelize.STRING(50),
-        allowNull: false,
-        unique: true,
-      },
-      platformName: {
+      platform: {
         type: Sequelize.STRING(100),
         allowNull: false,
       },
@@ -25,18 +20,21 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       deletedAt: {
         type: Sequelize.DATE,
         allowNull: true,
       },
     });
+    await queryInterface.addIndex("socials", ["platform"]);
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("socialLinks");
+    await queryInterface.dropTable("socials");
   },
 };
