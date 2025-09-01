@@ -8,8 +8,8 @@ class QueueService {
     });
     return jobs;
   }
-  async create(data) {
-    const queue = await Queue.create(data);
+  async create(data, options = {}) {
+    const queue = await Queue.create(data, options);
     return queue;
   }
 

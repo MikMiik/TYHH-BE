@@ -8,105 +8,35 @@ module.exports = (sequelize, DataTypes) => {
   }
   User.init(
     {
-      email: { type: DataTypes.STRING, allowNull: false, unique: true },
-
-      password: {
-        type: DataTypes.STRING(191),
-        allowNull: true,
+      email: { type: DataTypes.STRING(100), allowNull: false, unique: true },
+      password: { type: DataTypes.STRING(255), allowNull: true },
+      username: { type: DataTypes.STRING(100), allowNull: false, unique: true },
+      name: { type: DataTypes.STRING(100), allowNull: false },
+      avatar: { type: DataTypes.STRING(191), allowNull: true },
+      yearOfBirth: { type: DataTypes.INTEGER, allowNull: true },
+      city: { type: DataTypes.STRING(50), allowNull: true },
+      school: { type: DataTypes.STRING(100), allowNull: true },
+      phone: { type: DataTypes.STRING(20), allowNull: true, unique: true },
+      facebook: { type: DataTypes.STRING(191), allowNull: true, unique: true },
+      status: { type: DataTypes.STRING(20), allowNull: true },
+      role: { type: DataTypes.STRING(20), defaultValue: "user" },
+      point: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
+      googleId: { type: DataTypes.STRING(255), allowNull: true },
+      key: { type: DataTypes.STRING(255), allowNull: true },
+      activeKey: { type: DataTypes.BOOLEAN, defaultValue: false },
+      lastLogin: { type: DataTypes.DATE, allowNull: true },
+      verifiedAt: { type: DataTypes.DATE, allowNull: true },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
-
-      firstName: DataTypes.STRING(191),
-
-      lastName: DataTypes.STRING(191),
-
-      name: {
-        type: DataTypes.VIRTUAL,
-        get() {
-          return `${this.getDataValue("firstName")} ${this.getDataValue("lastName")}`;
-        },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
-
-      username: { type: DataTypes.STRING(191), unique: true },
-
-      googleId: {
-        type: DataTypes.STRING(255),
-      },
-
-      githubId: {
-        type: DataTypes.STRING(255),
-      },
-
-      birthday: DataTypes.DATE,
-
-      introduction: DataTypes.STRING(255),
-
-      website: DataTypes.STRING(255),
-
-      twoFactorAuth: DataTypes.BOOLEAN,
-
-      twoFactorSecret: DataTypes.STRING(50),
-
-      avatar: {
-        type: DataTypes.STRING(255),
-        get() {
-          const raw = this.getDataValue("avatar");
-          if (!raw) return null;
-          return raw.startsWith("http")
-            ? raw
-            : `${process.env.BASE_URL}/${raw}`;
-        },
-      },
-
-      coverImage: {
-        type: DataTypes.STRING(255),
-        get() {
-          const raw = this.getDataValue("coverImage");
-          if (!raw) return null;
-          return raw.startsWith("http")
-            ? raw
-            : `${process.env.BASE_URL}/${raw}`;
-        },
-      },
-
-      skills: DataTypes.JSON,
-
-      phone: { type: DataTypes.STRING(191), unique: true },
-
-      role: { type: DataTypes.STRING(191), defaultValue: "User" },
-
-      socials: DataTypes.JSON,
-
-      isFollowed: {
-        type: DataTypes.VIRTUAL,
-        get() {
-          return this.getDataValue("isFollowed");
-        },
-        set(value) {
-          this.setDataValue("isFollowed", value);
-        },
-      },
-
-      canViewProfile: {
-        type: DataTypes.VIRTUAL,
-      },
-
-      postsCount: DataTypes.INTEGER,
-
-      followersCount: DataTypes.INTEGER,
-
-      followingCount: DataTypes.INTEGER,
-
-      likesCount: DataTypes.INTEGER,
-
-      status: DataTypes.STRING(191),
-
-      lastLogin: DataTypes.DATE,
-
-      verifiedAt: DataTypes.DATE,
-
-      createdAt: DataTypes.DATE,
-
-      updatedAt: DataTypes.DATE,
+      deletedAt: { type: DataTypes.DATE, allowNull: true },
     },
     {
       sequelize,

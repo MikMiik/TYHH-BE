@@ -30,10 +30,12 @@ const checkAuth = require("@/middlewares/checkAuth");
 const { setContext } = require("@/middlewares/setContext");
 
 /*------------------------------------------------------------ */
+console.log(process.env.CLIENT_URL);
 
 // Middleware
 app.use(
-  cors([process.env.CLIENT_URL || "http://localhost:5173"], {
+  cors({
+    origin: [process.env.CLIENT_URL, "http://localhost:5173"],
     credentials: true,
   })
 );
@@ -53,7 +55,7 @@ app.set("views", "./src/views");
 app.set("layout", "./layouts/default");
 
 // Router
-app.use("/api/v1", checkAuth, setContext, router);
+app.use("/api/v1", setContext, router);
 
 // ErrorHandle
 app.use(notFoundHandler);

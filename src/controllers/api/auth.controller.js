@@ -76,13 +76,9 @@ exports.githubCallback = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
-  let { confirmPassword, agreeToTerms, ...data } = req.body;
-  try {
-    const result = await authService.register(data);
-    res.success(201, result);
-  } catch (error) {
-    res.error(400, error.message);
-  }
+  let { confirmPassword, ...data } = req.body;
+  const result = await authService.register(data);
+  res.success(201, result);
 };
 
 exports.changeEmail = async (req, res) => {

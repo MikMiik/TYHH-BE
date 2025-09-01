@@ -8,65 +8,80 @@ const { User } = require("@/models");
 
 exports.register = [
   checkSchema({
-    firstName: {
+    name: {
       trim: true,
       notEmpty: {
-        errorMessage: "Registration failed: Please enter your first name.",
+        errorMessage: "Vui lòng nhập họ tên.",
       },
     },
-    lastName: {
+    username: {
       trim: true,
       notEmpty: {
-        errorMessage: "Registration failed: Please enter your last name.",
+        errorMessage: "Vui lòng nhập tên đăng nhập.",
+      },
+      isLength: {
+        options: { min: 3 },
+        errorMessage: "Tên đăng nhập phải có ít nhất 3 ký tự.",
+      },
+      custom: {
+        options: async (value, { req }) => {
+          const count = await User.count({ where: { username: value } });
+          if (count > 0) {
+            throw new Error("Tên đăng nhập đã tồn tại.");
+          }
+        },
       },
     },
     email: {
       trim: true,
       notEmpty: {
-        errorMessage: "Registration failed: Please enter your email.",
+        errorMessage: "Vui lòng nhập email.",
       },
       isEmail: {
-        errorMessage: "Registration failed: Not a valid e-mail address.",
+        errorMessage: "Email không hợp lệ.",
       },
       custom: {
         options: async (value, { req }) => {
-          const user = await userService.getByEmail(value);
-          if (user) {
-            throw new Error(
-              "Registration failed: This email has already existed."
-            );
+          const count = await User.count({ where: { email: value } });
+          if (count > 0) {
+            throw new Error("Email đã tồn tại.");
           }
         },
       },
     },
-
+    phone: {
+      notEmpty: { errorMessage: "Vui lòng nhập số điện thoại." },
+      isMobilePhone: {
+        options: ["vi-VN"],
+        errorMessage: "Số điện thoại không hợp lệ.",
+      },
+      custom: {
+        options: async (value, { req }) => {
+          const count = await User.count({ where: { phone: value } });
+          if (count > 0) {
+            throw new Error("Số điện thoại đã được sử dụng.");
+          }
+          return true;
+        },
+      },
+    },
     password: {
       notEmpty: {
-        errorMessage: "Registration failed: Please enter your password.",
+        errorMessage: "Vui lòng nhập mật khẩu.",
       },
       isStrongPassword: {
         errorMessage:
-          "Registration failed: Password must contain at least 8 characters, including uppercase, lowercase, number, and symbol.",
+          "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
       },
     },
 
     confirmPassword: {
       notEmpty: {
-        errorMessage:
-          "Registration failed: Please enter your confirm password.",
+        errorMessage: "Vui lòng nhập xác nhận mật khẩu.",
       },
       custom: {
         options: async (value, { req }) => value === req.body.password,
-        errorMessage: "Registration failed: Passwords do not match.",
-      },
-    },
-
-    agreeToTerms: {
-      custom: {
-        options: (value) => {
-          return value === true || value === "true";
-        },
-        errorMessage: "Registration failed: You must agree to the terms.",
+        errorMessage: "Mật khẩu xác nhận không khớp.",
       },
     },
   }),
@@ -81,16 +96,18 @@ exports.login = [
         options: async (value, { req }) => {
           const { email, password } = req.body;
           if (!email || !password) {
-            throw new Error("Please enter your email and password to login");
+            throw new Error("Vui lòng nhập email và mật khẩu để đăng nhập");
           }
           const user = await userService.getByEmail(email);
           if (!user || !(await comparePassword(password, user.password))) {
-            throw new Error("Login failed: Invalid login information");
+            throw new Error(
+              "Đăng nhập thất bại: Thông tin đăng nhập không đúng"
+            );
           }
           if (!user.verifiedAt) {
             sendUnverifiedUserEmail(user.id);
             throw new Error(
-              "Your account is not verified. Please check the link we sent to your email to verify."
+              "Tài khoản của bạn chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản."
             );
           }
         },
@@ -107,7 +124,7 @@ exports.refreshToken = [
         options: async (value) => {
           const result = await findValidRefreshToken(value);
           if (!result) {
-            throw new Error("Refresh token invalid");
+            throw new Error("Refresh token không hợp lệ");
           }
         },
       },
@@ -130,9 +147,7 @@ exports.changeEmail = [
         options: async (value, { req }) => {
           const user = await userService.getByEmail(value);
           if (user) {
-            throw new Error(
-              "Registration error: This email has already existed"
-            );
+            throw new Error("Email này đã được sử dụng.");
           }
         },
       },
@@ -145,25 +160,25 @@ exports.changePassword = [
   checkSchema({
     currentPassword: {
       notEmpty: {
-        errorMessage: "Current password is required",
+        errorMessage: "Vui lòng nhập mật khẩu hiện tại.",
       },
     },
     newPassword: {
       notEmpty: {
-        errorMessage: "New password is required",
+        errorMessage: "Vui lòng nhập mật khẩu mới.",
       },
       isStrongPassword: {
         errorMessage:
-          "New password must contain at least 8 characters, including uppercase, lowercase, number, and symbol.",
+          "Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
       },
     },
     confirmPassword: {
       notEmpty: {
-        errorMessage: "Confirm password is required",
+        errorMessage: "Vui lòng nhập xác nhận mật khẩu.",
       },
       custom: {
         options: async (value, { req }) => value === req.body.newPassword,
-        errorMessage: "Passwords do not match",
+        errorMessage: "Mật khẩu xác nhận không khớp.",
       },
     },
   }),

@@ -9,22 +9,31 @@ const buildTokenResponse = require("@/utils/buildTokenResponse");
 const generateClientUrl = require("@/utils/generateClientUrl");
 const userService = require("./user.service");
 const queue = require("@/utils/queue");
-const settingService = require("./setting.service");
 const { User } = require("@/models");
 const axios = require("axios");
 
 const register = async (data) => {
-  const user = await userService.create({
-    ...data,
-    password: await hashPassword(data.password),
-  });
+  const { sequelize } = require("@/models");
+  const t = await sequelize.transaction();
+  try {
+    const user = await userService.create(
+      {
+        ...data,
+        password: await hashPassword(data.password),
+      },
+      { transaction: t }
+    );
 
-  sendUnverifiedUserEmail(user.id);
-  settingService.createDefaultSettings(user.id);
-  return {
-    message:
-      "Registration successful. Please check your email to verify your account.",
-  };
+    await sendUnverifiedUserEmail(user.id, "login", t);
+    await t.commit();
+    return {
+      message:
+        "Registration successful. Please check your email to verify your account.",
+    };
+  } catch (err) {
+    await t.rollback();
+    throw err;
+  }
 };
 
 const login = async (data) => {
@@ -160,7 +169,6 @@ const googleLogin = async (token) => {
           googleId: data.sub,
           verifiedAt: new Date(),
         });
-        settingService.createDefaultSettings(newUser.id);
         return buildTokenResponse({ userId: newUser.id, rememberMe: true });
       }
       const result = await buildTokenResponse({
@@ -210,7 +218,6 @@ const githubLogin = async (code) => {
           address: userData.location || "",
           verifiedAt: new Date(),
         });
-        settingService.createDefaultSettings(newUser.id);
         return buildTokenResponse({ userId: newUser.id, rememberMe: true });
       }
       const result = await buildTokenResponse({
