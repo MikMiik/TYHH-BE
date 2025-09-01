@@ -5,7 +5,6 @@ const authValidator = require("@/validators/auth.validator");
 
 router.post("/login", authValidator.login, authController.login);
 router.post("/google", authController.googleLogin);
-router.get("/github/callback", authController.githubCallback);
 router.post("/register", authValidator.register, authController.register);
 router.get("/me", authController.me);
 router.post(

@@ -184,55 +184,6 @@ const googleLogin = async (token) => {
   }
 };
 
-const githubLogin = async (code) => {
-  try {
-    const tokenResponse = await axios.post(
-      "https://github.com/login/oauth/access_token",
-      {
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
-        code,
-      },
-      {
-        headers: { Accept: "application/json" },
-      }
-    );
-
-    const accessToken = tokenResponse.data.access_token;
-    if (!accessToken) return null;
-
-    // Dùng token gọi API lấy user info
-    const userResponse = await axios.get("https://api.github.com/user", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    const userData = userResponse.data;
-    if (userData) {
-      const user = await userService.getByEmail(userData.email);
-      if (!user) {
-        const newUser = await userService.create({
-          email: userData.email || null,
-          firstName: userData.name.split(/\s+/)[0] || "",
-          lastName: userData.name.split(/\s+/).slice(1).join(" ") || "",
-          avatar: userData.avatar_url,
-          githubId: userData.id,
-          address: userData.location || "",
-          verifiedAt: new Date(),
-        });
-        return buildTokenResponse({ userId: newUser.id, rememberMe: true });
-      }
-      const result = await buildTokenResponse({
-        userId: user.id,
-        rememberMe: true,
-      });
-      await userService.update(user.id, { lastLogin: new Date() });
-      return result;
-    }
-  } catch (error) {
-    console.error(error.response?.data || error.message);
-    return null;
-  }
-};
-
 module.exports = {
   register,
   login,
@@ -243,5 +194,4 @@ module.exports = {
   changeEmail,
   changePassword,
   googleLogin,
-  githubLogin,
 };
