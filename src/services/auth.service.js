@@ -77,6 +77,7 @@ const logout = async (refreshToken) => {
 const sendForgotEmail = async (email) => {
   try {
     const user = await userService.getByEmail(email);
+
     if (user) {
       const tokenData = generateMailToken(user.id);
       const resetPasswordUrl = generateClientUrl("reset-password", {
@@ -90,10 +91,7 @@ const sendForgotEmail = async (email) => {
         resetPasswordUrl,
       });
     }
-    return {
-      message:
-        "If your email exists in our system, a password reset link has been sent.",
-    };
+    return true;
   } catch (error) {
     throw new Error(
       "Failed to send password reset email. Please try again later."

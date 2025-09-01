@@ -95,7 +95,6 @@ exports.login = [
       custom: {
         options: async (value, { req }) => {
           const { email, password } = req.body;
-          console.log("khihihihih");
 
           if (!email || !password) {
             throw new Error("Vui lòng nhập email và mật khẩu để đăng nhập");

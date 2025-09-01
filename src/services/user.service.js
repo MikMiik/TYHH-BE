@@ -31,7 +31,7 @@ class UsersService {
       where: {
         email,
       },
-      attributes: ["id", "password", "verifiedAt"],
+      attributes: ["id", "password", "email", "verifiedAt"],
     });
 
     return user;
