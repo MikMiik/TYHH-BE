@@ -11,6 +11,7 @@ const userService = require("./user.service");
 const queue = require("@/utils/queue");
 const { User } = require("@/models");
 const axios = require("axios");
+const { default: slugify } = require("slugify");
 
 const register = async (data) => {
   const { sequelize } = require("@/models");
@@ -156,13 +157,14 @@ const googleLogin = async (token) => {
         },
       }
     );
+
     if (data && data.email_verified) {
       const user = await userService.getByEmail(data.email);
       if (!user) {
         const newUser = await userService.create({
           email: data.email,
-          firstName: data.given_name,
-          lastName: data.family_name,
+          name: data.name,
+          username: slugify(data.name, { lower: true }),
           avatar: data.picture,
           googleId: data.sub,
           verifiedAt: new Date(),
@@ -173,7 +175,10 @@ const googleLogin = async (token) => {
         userId: user.id,
         rememberMe: true,
       });
-      await userService.update(user.id, { lastLogin: new Date() });
+      await userService.update(user.id, {
+        lastLogin: new Date(),
+        googleId: data.sub,
+      });
       return result;
     }
   } catch (error) {
