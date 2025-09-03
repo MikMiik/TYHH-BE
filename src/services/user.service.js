@@ -1,4 +1,5 @@
 const { User, Notification, Setting } = require("@/models");
+const { hashPassword } = require("@/utils/bcrytp");
 const { Op } = require("sequelize");
 class UsersService {
   async getAll() {
@@ -26,6 +27,28 @@ class UsersService {
     return user;
   }
 
+  async getProfile(id) {
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [{ id }, { username: id }],
+      },
+      attributes: [
+        "id",
+        "email",
+        "name",
+        "username",
+        "avatar",
+        "facebook",
+        "phone",
+        "yearOfBirth",
+        "city",
+        "school",
+      ],
+    });
+
+    return user;
+  }
+
   async getByEmail(email) {
     const user = await User.findOne({
       where: {
@@ -42,16 +65,7 @@ class UsersService {
       where: {
         [Op.or]: [{ id }, { username: id }],
       },
-      attributes: [
-        "id",
-        "email",
-        "name",
-        "username",
-        "avatar",
-        "role",
-        "status",
-        "verifiedAt",
-      ],
+      attributes: ["id", "email", "name", "username", "avatar"],
     });
 
     return user;
@@ -71,7 +85,24 @@ class UsersService {
   }
 
   async update(id, data) {
-    const result = await User.update(data, { where: { id } });
+    const result = await User.update(
+      {
+        ...data,
+        password: await hashPassword(data.newPassword),
+      },
+      { where: { id } }
+    );
+    return result;
+  }
+
+  async uploadAvatar(id, avatar) {
+    const result = await User.update(
+      {
+        avatar,
+      },
+      { where: { id } }
+    );
+
     return result;
   }
 

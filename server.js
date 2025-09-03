@@ -36,6 +36,13 @@ console.log(process.env.CLIENT_URL);
 app.use(
   cors({
     origin: [process.env.CLIENT_URL, "http://localhost:5173"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+    ],
     credentials: true,
   })
 );
@@ -47,6 +54,17 @@ app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(methodOverride("_method"));
 app.use(responseEnhancer);
+
+// Imagekit
+// allow cross-origin requests
+// app.use(function (req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept"
+//   );
+//   next();
+// });
 
 // ViewEngine
 app.use(expressLayouts);

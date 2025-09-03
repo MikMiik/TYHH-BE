@@ -17,14 +17,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
-      deletedAt: { type: DataTypes.DATE, allowNull: true },
     },
     {
       sequelize,
       modelName: "City",
       tableName: "cities",
       timestamps: true,
-      paranoid: true,
     }
   );
   return City;
