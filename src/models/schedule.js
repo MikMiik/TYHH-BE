@@ -6,10 +6,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   Schedule.init(
     {
-      courseId: { type: DataTypes.INTEGER, allowNull: false },
-      startTime: { type: DataTypes.DATE, allowNull: false },
-      endTime: { type: DataTypes.DATE, allowNull: false },
-      location: { type: DataTypes.STRING(191), allowNull: true },
+      target: { type: DataTypes.STRING(100), allowNull: true },
+      url: { type: DataTypes.STRING(255), allowNull: true },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

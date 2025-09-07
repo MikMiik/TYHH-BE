@@ -6,9 +6,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   Social.init(
     {
-      name: { type: DataTypes.STRING(100), allowNull: false, unique: true },
-      icon: { type: DataTypes.STRING(191), allowNull: true },
-      url: { type: DataTypes.STRING(191), allowNull: true },
+      platform: { type: DataTypes.STRING(100), allowNull: false },
+      url: { type: DataTypes.STRING(255), allowNull: false },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

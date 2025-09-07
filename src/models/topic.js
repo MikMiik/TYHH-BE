@@ -6,8 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Topic.init(
     {
-      name: { type: DataTypes.STRING(191), allowNull: false, unique: true },
-      description: { type: DataTypes.TEXT, allowNull: true },
+      title: { type: DataTypes.STRING(255), allowNull: false },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

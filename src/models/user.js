@@ -1,10 +1,14 @@
 "use strict";
-const getCurrentUser = require("@/utils/getCurrentUser");
 const { Model } = require("sequelize");
-const { default: slugify } = require("slugify");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    static associate(models) {}
+    static associate(models) {
+      // 1 user có nhiều course
+      User.hasMany(models.Course, {
+        foreignKey: "teacherId",
+        as: "courses",
+      });
+    }
   }
   User.init(
     {
