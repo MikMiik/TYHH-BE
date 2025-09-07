@@ -55,17 +55,6 @@ app.use(cookieParser());
 app.use(methodOverride("_method"));
 app.use(responseEnhancer);
 
-// Imagekit
-// allow cross-origin requests
-// app.use(function (req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept"
-//   );
-//   next();
-// });
-
 // ViewEngine
 app.use(expressLayouts);
 app.set("view engine", "ejs");
@@ -73,7 +62,7 @@ app.set("views", "./src/views");
 app.set("layout", "./layouts/default");
 
 // Router
-app.use("/api/v1", setContext, router);
+app.use("/api/v1", checkAuth, setContext, router);
 
 // ErrorHandle
 app.use(notFoundHandler);

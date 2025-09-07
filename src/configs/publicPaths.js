@@ -1,17 +1,16 @@
 const { match } = require("path-to-regexp");
 const publicPaths = [
   { path: "/", method: "get", exact: true },
-  { path: "/about", method: "get", startsWith: true },
-  { path: "/contact", method: "get", startsWith: true },
   { path: "/auth", method: "all", startsWith: true },
-  { path: "/posts", method: "get", exact: true },
-  { path: "/posts/search", method: "get", startsWith: true },
-  { path: "/posts/:id", method: "get", pattern: true, startsWith: true },
-  { path: "/topics", method: "get", startsWith: true },
-  { path: "/profiles", method: "get", exact: true },
-  { path: "/profiles/:id", method: "get", startsWith: true, pattern: true },
-  { path: "/uploads", method: "get", startsWith: true },
-  { path: "/chat", method: "all", startsWith: true },
+  { path: "/cities", method: "get" },
+  { path: "/cities/:id", method: "get" },
+  { path: "/courses", method: "get" },
+  { path: "/courses/:id", method: "get" },
+  { path: "/topics", method: "get" },
+  { path: "/schedules", method: "get" },
+  { path: "/imagekit/auth", method: "get", exact: true },
+  { path: "/siteinfo", method: "get" },
+  { path: "/socials", method: "get" },
 ];
 
 function isPublicRoute(path, method) {

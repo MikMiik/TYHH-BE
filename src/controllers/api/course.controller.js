@@ -1,8 +1,17 @@
 const courseService = require("@/services/course.service");
-const throw404 = require("@/utils/throw404");
+
+exports.getAll = async (req, res) => {
+  const { limit = 10, page = 1 } = req.query;
+  const pageNum = isNaN(+page) ? 1 : +page;
+  const limitNum = isNaN(+limit) ? 10 : +limit;
+  const courses = await courseService.getAllCourses({
+    limit: limitNum,
+    offset: (pageNum - 1) * limitNum,
+  });
+  res.success(200, courses);
+};
 
 exports.getOne = async (req, res) => {
   const course = await courseService.getCourseById(req.params.id);
-  if (!course) throw404("Course not found");
   res.success(200, course);
 };

@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
+      slug: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+        unique: true,
+      },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,

@@ -1,10 +1,20 @@
 const { Course } = require("@/models");
 
 class CourseService {
-  async getAllCourses() {
+  async getAllCourses({ limit, offset }) {
     const courses = await Course.findAll({
-      order: [["name", "ASC"]],
-      attributes: ["id", "name"],
+      limit,
+      offset,
+      attributes: [
+        "id",
+        "title",
+        "teacherId",
+        "thumbnail",
+        "price",
+        "discount",
+        "isFree",
+      ],
+      include: [{ association: "teacher", attributes: ["id", "name"] }],
     });
     return courses;
   }
@@ -13,6 +23,26 @@ class CourseService {
       attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
       include: [
         { association: "teacher", attributes: ["id", "name", "facebook"] },
+        {
+          association: "outlines",
+          attributes: ["id", "title"],
+          separate: true,
+          order: [["order", "ASC"]],
+          include: [
+            {
+              association: "livestreams",
+              attributes: ["id", "title", "url", "view"],
+              separate: true,
+              order: [["order", "ASC"]],
+              include: [
+                {
+                  association: "documents",
+                  attributes: ["id", "url"],
+                },
+              ],
+            },
+          ],
+        },
       ],
     });
     return course;

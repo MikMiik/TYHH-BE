@@ -1,8 +1,12 @@
-const { Topic } = require("@/models");
-const throw404 = require("@/utils/throw404");
+const topicService = require("@/services/topic.service");
 
 exports.getAll = async (req, res) => {
-  const topics = await Topic.findAll({ attributes: ["id", "title"] });
-  if (!topics) throw404("Topics not found");
+  const { limit = 10, page = 1 } = req.query;
+  const pageNum = isNaN(+page) ? 1 : +page;
+  const limitNum = isNaN(+limit) ? 10 : +limit;
+  const topics = await topicService.getAll({
+    limit: limitNum,
+    offset: (pageNum - 1) * limitNum,
+  });
   res.success(200, topics);
 };

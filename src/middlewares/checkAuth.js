@@ -39,7 +39,6 @@ async function checkAuth(req, res, next) {
     // Với private route, token phải hợp lệ
     const payload = jwtService.verifyAccessToken(token);
     req.userId = payload.userId;
-
     next();
   } catch (error) {
     return res.error(401, error.message);

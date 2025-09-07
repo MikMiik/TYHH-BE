@@ -2,14 +2,21 @@
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class CourseOutline extends Model {
-    static associate(models) {}
+    static associate(models) {
+      CourseOutline.belongsTo(models.Course, {
+        foreignKey: "courseId",
+        as: "course",
+      });
+      CourseOutline.hasMany(models.Livestream, {
+        foreignKey: "courseOutlineId",
+        as: "livestreams",
+      });
+    }
   }
   CourseOutline.init(
     {
+      title: { type: DataTypes.STRING(255), allowNull: false },
       courseId: { type: DataTypes.INTEGER, allowNull: false },
-      title: { type: DataTypes.STRING(191), allowNull: false },
-      description: { type: DataTypes.TEXT, allowNull: true },
-      order: { type: DataTypes.INTEGER, allowNull: true },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

@@ -1,7 +1,7 @@
 const { session } = require("@/middlewares/setContext");
 
-function getCurrentUser() {
+function getCurrentUserId() {
   return session.get("userId");
 }
 
-module.exports = getCurrentUser;
+module.exports = getCurrentUserId;

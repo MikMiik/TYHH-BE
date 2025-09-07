@@ -6,10 +6,17 @@ module.exports = (sequelize, DataTypes) => {
   }
   Document.init(
     {
-      name: { type: DataTypes.STRING(191), allowNull: false },
-      url: { type: DataTypes.STRING(255), allowNull: false },
-      courseId: { type: DataTypes.INTEGER, allowNull: false },
-      type: { type: DataTypes.STRING(50), allowNull: true },
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false,
+      },
+      livestreamId: { type: DataTypes.INTEGER, allowNull: true },
+      vip: { type: DataTypes.BOOLEAN, defaultValue: false },
+      title: { type: DataTypes.STRING(255), allowNull: true },
+      thumbnail: { type: DataTypes.STRING(255), allowNull: true },
+      url: { type: DataTypes.STRING(255), allowNull: true },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
