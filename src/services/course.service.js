@@ -1,10 +1,49 @@
-const { Course } = require("@/models");
+const { Course, Topic, CourseTopic, sequelize } = require("@/models");
 
 class CourseService {
-  async getAllCourses({ limit, offset }) {
-    const courses = await Course.findAll({
+  async getAllCourses({ limit, offset, topic, sort = "newest" }) {
+    let whereClause = {};
+    if (topic) {
+      const topicInstance = await Topic.findOne({ where: { slug: topic } });
+      if (topicInstance) {
+        const courseTopics = await CourseTopic.findAll({
+          where: { topicId: topicInstance.id },
+          attributes: ["courseId"],
+        });
+        const courseIds = courseTopics.map((ct) => ct.courseId);
+        if (courseIds.length === 0) {
+          return [];
+        }
+        whereClause.id = courseIds;
+      } else {
+        return [];
+      }
+    }
+
+    // Xử lý sort order
+    let orderClause = [];
+    switch (sort) {
+      case "oldest":
+        orderClause = [["createdAt", "ASC"]];
+        break;
+      case "popularity":
+        orderClause = [
+          [sequelize.literal("totalView"), "DESC"],
+          ["createdAt", "DESC"],
+        ];
+        break;
+      case "newest":
+      default:
+        orderClause = [["createdAt", "DESC"]];
+        break;
+    }
+
+    const { count, rows: courses } = await Course.findAndCountAll({
       limit,
       offset,
+      where: whereClause,
+      order: orderClause,
+      distinct: true,
       attributes: [
         "id",
         "title",
@@ -13,10 +52,21 @@ class CourseService {
         "price",
         "discount",
         "isFree",
+        "createdAt",
+        [
+          sequelize.literal(`(
+            SELECT COALESCE(SUM(livestreams.view), 0)
+            FROM livestreams
+            WHERE livestreams.courseId = Course.id
+          )`),
+          "totalView",
+        ],
       ],
       include: [{ association: "teacher", attributes: ["id", "name"] }],
     });
-    return courses;
+
+    const totalPages = Math.ceil(count / limit);
+    return { courses, totalPages };
   }
   async getCourseById(courseId) {
     const course = await Course.findByPk(courseId, {

@@ -70,10 +70,17 @@ module.exports = (sequelize, DataTypes) => {
 
     const livestreams = Array.isArray(result) ? result : result ? [result] : [];
     if (livestreams.length === 0) return;
+
+    // Only process Sequelize model instances
+    const validLivestreams = livestreams.filter(
+      (livestream) =>
+        livestream && typeof livestream.setDataValue === "function"
+    );
+
     if (!userId) {
-      livestreams.forEach((p) => p.setDataValue("isSeen", false));
+      validLivestreams.forEach((p) => p.setDataValue("isSeen", false));
     } else {
-      const livestreamIds = livestreams.map((p) => p.id);
+      const livestreamIds = validLivestreams.map((p) => p.id);
 
       const userLivestreams = await UserLivestream.findAll({
         where: {
@@ -83,7 +90,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       const seenIds = new Set(userLivestreams.map((l) => l.livestreamId));
 
-      livestreams.forEach((p) => {
+      validLivestreams.forEach((p) => {
         p.setDataValue("isSeen", seenIds.has(p.id));
       });
     }
