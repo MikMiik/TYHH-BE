@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         as: "outlines",
       });
       Course.belongsToMany(models.Topic, {
-        through: "CourseTopics",
+        through: "CourseTopic",
         foreignKey: "courseId",
         otherKey: "topicId",
         as: "topics",
@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
   Course.init(
     {
       title: { type: DataTypes.STRING(255), allowNull: false },
+      slug: { type: DataTypes.STRING(255), allowNull: true, unique: true },
       description: { type: DataTypes.TEXT, allowNull: true },
       teacherId: { type: DataTypes.INTEGER, allowNull: true },
       price: { type: DataTypes.DECIMAL(10, 2), allowNull: true },

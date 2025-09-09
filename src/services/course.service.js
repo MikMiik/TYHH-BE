@@ -47,6 +47,7 @@ class CourseService {
       attributes: [
         "id",
         "title",
+        "slug",
         "teacherId",
         "thumbnail",
         "price",
@@ -68,8 +69,9 @@ class CourseService {
     const totalPages = Math.ceil(count / limit);
     return { courses, totalPages };
   }
-  async getCourseById(courseId) {
-    const course = await Course.findByPk(courseId, {
+  async getCourseBySlug(slug) {
+    const course = await Course.findOne({
+      where: { slug },
       attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
       include: [
         { association: "teacher", attributes: ["id", "name", "facebook"] },
@@ -87,7 +89,7 @@ class CourseService {
               include: [
                 {
                   association: "documents",
-                  attributes: ["id", "url"],
+                  attributes: ["id", "slug"],
                 },
               ],
             },

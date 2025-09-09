@@ -14,6 +14,6 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getOne = async (req, res) => {
-  const course = await courseService.getCourseById(req.params.id);
+  const course = await courseService.getCourseBySlug(req.params.slug);
   res.success(200, course);
 };

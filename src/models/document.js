@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
       livestreamId: { type: DataTypes.INTEGER, allowNull: true },
       vip: { type: DataTypes.BOOLEAN, defaultValue: false },
       title: { type: DataTypes.STRING(255), allowNull: true },
+      slug: { type: DataTypes.STRING(255), allowNull: true, unique: true },
       thumbnail: { type: DataTypes.STRING(255), allowNull: true },
-      url: { type: DataTypes.STRING(255), allowNull: true },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

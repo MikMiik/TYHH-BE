@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   CourseOutline.init(
     {
       title: { type: DataTypes.STRING(255), allowNull: false },
+      slug: { type: DataTypes.STRING(255), allowNull: true, unique: true },
       courseId: { type: DataTypes.INTEGER, allowNull: false },
       createdAt: {
         type: DataTypes.DATE,

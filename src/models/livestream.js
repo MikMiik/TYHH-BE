@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       title: { type: DataTypes.STRING(255), allowNull: false },
+      slug: { type: DataTypes.STRING(255), allowNull: true, unique: true },
       courseId: { type: DataTypes.INTEGER, allowNull: false },
       courseOutlineId: { type: DataTypes.INTEGER, allowNull: false },
       url: { type: DataTypes.STRING(255), allowNull: true },

@@ -6,7 +6,30 @@ class TopicService {
       limit,
       offset,
       order: [["createdAt", "DESC"]],
-      attributes: ["id", "title", "slug"],
+      attributes: ["id", "title", "slug", "createdAt"],
+      include: [
+        {
+          association: "courses",
+          attributes: [
+            "id",
+            "title",
+            "slug",
+            "teacherId",
+            "thumbnail",
+            "price",
+            "discount",
+            "isFree",
+            "createdAt",
+          ],
+          through: { attributes: [] },
+          include: [
+            {
+              association: "teacher",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+      ],
     });
     return topics;
   }
