@@ -2,7 +2,12 @@
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Document extends Model {
-    static associate(models) {}
+    static associate(models) {
+      Document.belongsTo(models.Livestream, {
+        foreignKey: "livestreamId",
+        as: "livestream",
+      });
+    }
   }
   Document.init(
     {
@@ -16,6 +21,11 @@ module.exports = (sequelize, DataTypes) => {
       vip: { type: DataTypes.BOOLEAN, defaultValue: false },
       title: { type: DataTypes.STRING(255), allowNull: true },
       slug: { type: DataTypes.STRING(255), allowNull: true, unique: true },
+      downloadCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       thumbnail: { type: DataTypes.STRING(255), allowNull: true },
       createdAt: {
         type: DataTypes.DATE,

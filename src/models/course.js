@@ -11,8 +11,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "courseId",
         as: "outlines",
       });
+      Course.hasMany(models.Livestream, {
+        foreignKey: "courseId",
+        as: "livestreams",
+      });
       Course.belongsToMany(models.Topic, {
-        through: "CourseTopic",
+        through: models.CourseTopic,
         foreignKey: "courseId",
         otherKey: "topicId",
         as: "topics",

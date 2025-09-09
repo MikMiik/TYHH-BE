@@ -10,6 +10,7 @@ const socialRouter = require("./social.route");
 const topicRouter = require("./topic.route");
 const scheduleRouter = require("./schedule.route");
 const courseRouter = require("./course.route");
+const documentRouter = require("./document.route");
 
 router.use("/auth", authRouter);
 router.use("/users", userRouter);
@@ -19,5 +20,6 @@ router.use("/cities", cityRouter);
 router.use("/topics", topicRouter);
 router.use("/schedules", scheduleRouter);
 router.use("/courses", courseRouter);
+router.use("/documents", documentRouter);
 
 module.exports = router;

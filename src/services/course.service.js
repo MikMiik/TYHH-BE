@@ -67,6 +67,10 @@ class CourseService {
     });
 
     const totalPages = Math.ceil(count / limit);
+    // Nếu page vượt quá totalPages thì trả về mảng rỗng
+    if (offset / limit + 1 > totalPages) {
+      return { courses: [], totalPages };
+    }
     return { courses, totalPages };
   }
   async getCourseBySlug(slug) {
