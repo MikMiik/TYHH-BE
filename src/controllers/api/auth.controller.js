@@ -139,3 +139,19 @@ exports.resetPassword = async (req, res) => {
     res.error(401, error.message);
   }
 };
+
+exports.checkKey = async (req, res) => {
+  try {
+    const { key } = req.body;
+    const userId = req.userId; // Từ middleware checkAuth
+
+    if (!key) {
+      return res.error(400, "Key is required");
+    }
+
+    const result = await authService.checkKey(userId, key);
+    res.success(200, result);
+  } catch (error) {
+    res.error(400, error.message);
+  }
+};

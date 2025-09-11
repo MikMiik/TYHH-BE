@@ -187,6 +187,39 @@ const googleLogin = async (token) => {
   }
 };
 
+const checkKey = async (userId, key) => {
+  try {
+    const user = await userService.getUserKey(userId);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.activeKey) {
+      throw new Error("Key already activated");
+    }
+
+    console.log(user.key);
+
+    if (user.key !== key) {
+      throw new Error("Invalid key");
+    }
+
+    // Activate user
+    await userService.update(userId, {
+      key: key,
+      activeKey: true,
+    });
+
+    return {
+      message: "Key activated successfully",
+      activeKey: true,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -197,4 +230,5 @@ module.exports = {
   changeEmail,
   changePassword,
   googleLogin,
+  checkKey,
 };

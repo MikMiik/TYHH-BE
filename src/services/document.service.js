@@ -97,7 +97,16 @@ class DocumentService {
   async getDocumentBySlug(slug) {
     const document = await Document.findOne({
       where: { slug },
-      attributes: ["id", "title", "slug", "downloadCount", "vip", "createdAt"],
+      attributes: [
+        "id",
+        "title",
+        "slug",
+        "downloadCount",
+        "vip",
+        "createdAt",
+        "url",
+        "slidenote",
+      ],
       include: [
         {
           association: "livestream",

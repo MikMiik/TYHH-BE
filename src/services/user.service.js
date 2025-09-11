@@ -27,6 +27,14 @@ class UsersService {
     return user;
   }
 
+  async getUserKey(id) {
+    const user = await User.findByPk(id, {
+      attributes: ["key"],
+    });
+
+    return user || null;
+  }
+
   async getProfile(id) {
     const user = await User.findOne({
       where: {
@@ -65,7 +73,7 @@ class UsersService {
       where: {
         [Op.or]: [{ id }, { username: id }],
       },
-      attributes: ["id", "email", "name", "username", "avatar"],
+      attributes: ["id", "email", "name", "username", "avatar", "activeKey"],
     });
 
     return user;

@@ -30,7 +30,6 @@ const checkAuth = require("@/middlewares/checkAuth");
 const { setContext } = require("@/middlewares/setContext");
 
 /*------------------------------------------------------------ */
-console.log(process.env.CLIENT_URL);
 
 // Middleware
 app.use(

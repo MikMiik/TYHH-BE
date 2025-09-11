@@ -27,5 +27,6 @@ router.post(
   authValidator.changeEmail,
   authController.changeEmail
 );
+router.post("/check-key", authController.checkKey);
 
 module.exports = router;
