@@ -8,6 +8,7 @@ exports.getAll = async (req, res) => {
     vip = false,
     sort = "newest",
   } = req.query;
+
   const pageNum = isNaN(+page) ? 1 : +page;
   const limitNum = isNaN(+limit) ? 10 : +limit;
   const data = await documentService.getAllDocuments({

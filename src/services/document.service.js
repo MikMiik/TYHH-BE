@@ -1,12 +1,12 @@
-const { Document, Livestream, Course, Topic, sequelize } = require("../models");
+const { Document, sequelize } = require("../models");
 const { Op } = require("sequelize");
 
 class DocumentService {
   async getAllDocuments({ limit, offset, vip, sort = "newest", topic }) {
     let whereClause = {};
-    if (vip) {
-      whereClause.vip = true;
-    }
+
+    whereClause.vip = vip;
+
     // Xử lý sort order
     let orderClause = [];
     switch (sort) {

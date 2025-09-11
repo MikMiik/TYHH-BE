@@ -11,6 +11,7 @@ const topicRouter = require("./topic.route");
 const scheduleRouter = require("./schedule.route");
 const courseRouter = require("./course.route");
 const documentRouter = require("./document.route");
+const livestreamRouter = require("./livestream.route");
 
 router.use("/auth", authRouter);
 router.use("/users", userRouter);
@@ -21,5 +22,6 @@ router.use("/topics", topicRouter);
 router.use("/schedules", scheduleRouter);
 router.use("/courses", courseRouter);
 router.use("/documents", documentRouter);
+router.use("/livestreams", livestreamRouter);
 
 module.exports = router;

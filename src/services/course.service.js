@@ -87,7 +87,7 @@ class CourseService {
           include: [
             {
               association: "livestreams",
-              attributes: ["id", "title", "url", "view"],
+              attributes: ["id", "title", "slug", "url", "view"],
               separate: true,
               order: [["order", "ASC"]],
               include: [
