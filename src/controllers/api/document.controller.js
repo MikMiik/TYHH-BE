@@ -23,6 +23,5 @@ exports.getAll = async (req, res) => {
 
 exports.getOne = async (req, res) => {
   const document = await documentService.getDocumentBySlug(req.params.slug);
-  if (!document) return res.error(404, "Document not found");
   res.success(200, document);
 };

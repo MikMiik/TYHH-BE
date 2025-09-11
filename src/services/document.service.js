@@ -94,6 +94,42 @@ class DocumentService {
 
     return { documents: docs, totalPages };
   }
+  async getDocumentBySlug(slug) {
+    const document = await Document.findOne({
+      where: { slug },
+      attributes: ["id", "title", "slug", "downloadCount", "vip", "createdAt"],
+      include: [
+        {
+          association: "livestream",
+          attributes: ["id", "title", "slug", "view"],
+          required: false,
+          include: [
+            {
+              association: "course",
+              attributes: ["id", "title", "slug"],
+              required: false,
+              include: [
+                {
+                  association: "topics",
+                  attributes: ["id", "title", "slug"],
+                  through: { attributes: [] },
+                  required: false,
+                },
+              ],
+            },
+            {
+              association: "documents",
+              attributes: ["id", "slug", "title"],
+              where: { slug: { [Op.ne]: slug } },
+              required: false,
+            },
+          ],
+        },
+      ],
+    });
+
+    return document;
+  }
 }
 
 module.exports = new DocumentService();

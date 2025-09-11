@@ -21,14 +21,16 @@ class LivestreamService {
                   attributes: ["id", "title", "slug", "url", "view"],
                   separate: true,
                   order: [["order", "ASC"]],
+                  include: [
+                    {
+                      association: "documents",
+                      attributes: ["id", "slug"],
+                    },
+                  ],
                 },
               ],
             },
           ],
-        },
-        {
-          association: "documents",
-          attributes: ["id", "slug"],
         },
       ],
     });
