@@ -121,6 +121,52 @@ class UsersService {
     const result = await user.destroy();
     return result;
   }
+
+  async getMyCourses(userId) {
+    const user = await User.findByPk(userId, {
+      include: [
+        {
+          association: "registeredCourses",
+          attributes: [
+            "id",
+            "title",
+            "slug",
+            "description",
+            "thumbnail",
+            "price",
+            "discount",
+            "isFree",
+            "createdAt",
+          ],
+          through: {
+            attributes: ["createdAt"],
+            as: "registration",
+          },
+          include: [
+            {
+              association: "teacher",
+              attributes: ["id", "name", "avatar"],
+            },
+            {
+              association: "topics",
+              attributes: ["id", "title", "slug"],
+              through: { attributes: [] },
+            },
+            {
+              association: "livestreams",
+              attributes: ["id", "title", "view"],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user.registeredCourses || [];
+  }
 }
 
 module.exports = new UsersService();

@@ -21,6 +21,13 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "topicId",
         as: "topics",
       });
+      // Many-to-many: Course được đăng ký bởi nhiều User
+      Course.belongsToMany(models.User, {
+        through: models.CourseUser,
+        foreignKey: "courseId",
+        otherKey: "userId",
+        as: "students",
+      });
     }
   }
   Course.init(

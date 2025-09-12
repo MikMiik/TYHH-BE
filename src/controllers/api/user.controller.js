@@ -15,3 +15,13 @@ exports.uploadAvatar = async (req, res) => {
   const user = await userService.uploadAvatar(req.params.id, req.body.avatar);
   res.success(200, user);
 };
+
+exports.getMyCourses = async (req, res) => {
+  try {
+    const userId = req.userId; // Từ middleware checkAuth
+    const courses = await userService.getMyCourses(userId);
+    res.success(200, courses);
+  } catch (error) {
+    res.error(400, error.message);
+  }
+};
