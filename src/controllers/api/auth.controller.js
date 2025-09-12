@@ -1,9 +1,8 @@
 const usersService = require("@/services/user.service");
 const authService = require("@/services/auth.service");
-const {
-  verifyMailToken,
-  generateAccessToken,
-} = require("@/services/jwt.service");
+const cookieManager = require("@/configs/cookie");
+const buildTokenResponse = require("@/utils/buildTokenResponse");
+const { verifyMailToken } = require("@/services/jwt.service");
 const { hashPassword } = require("@/utils/bcrytp");
 
 exports.login = async (req, res) => {
@@ -14,7 +13,19 @@ exports.login = async (req, res) => {
       rememberMe,
     }))(req.body);
     const tokenData = await authService.login(data);
-    res.success(200, tokenData);
+
+    // Set httpOnly cookies instead of returning tokens in response
+    cookieManager.setAuthCookies(res, {
+      accessToken: tokenData.accessToken,
+      refreshToken: tokenData.refreshToken,
+      rememberMe: data.rememberMe,
+    });
+
+    // Return success without exposing tokens
+    res.success(200, {
+      message: "Login successful",
+      user: tokenData.user,
+    });
   } catch (error) {
     res.error(401, error.message);
   }
@@ -27,7 +38,18 @@ exports.googleLogin = async (req, res) => {
       return res.error(401, "No token provided");
     }
     const userData = await authService.googleLogin(token);
-    res.success(200, userData);
+
+    // Set httpOnly cookies for Google login too
+    cookieManager.setAuthCookies(res, {
+      accessToken: userData.accessToken,
+      refreshToken: userData.refreshToken,
+      rememberMe: true, // Google login defaults to remember
+    });
+
+    res.success(200, {
+      message: "Google login successful",
+      user: userData.user,
+    });
   } catch (error) {
     res.error(401, error.message);
   }
@@ -66,7 +88,12 @@ exports.changePassword = async (req, res) => {
 
 exports.me = async (req, res) => {
   try {
-    const accessToken = req.headers?.authorization?.replace("Bearer ", "");
+    // Get access token from cookies instead of Authorization header
+    const accessToken = cookieManager.getAccessToken(req);
+    if (!accessToken) {
+      return res.error(401, "Access token not found");
+    }
+
     const { userId } = await authService.checkUser(accessToken);
     const user = await usersService.getMe(userId);
     res.success(200, user);
@@ -77,21 +104,54 @@ exports.me = async (req, res) => {
 
 exports.refreshToken = async (req, res) => {
   try {
-    const tokenData = await authService.refreshAccessToken(
-      req.body.refreshToken
-    );
-    res.success(200, tokenData);
+    // Get refresh token from cookies
+    const refreshToken = cookieManager.getRefreshToken(req);
+    if (!refreshToken) {
+      return res.error(403, "Refresh token not found");
+    }
+
+    const tokenData = await authService.refreshAccessToken(refreshToken);
+
+    // Set new cookies instead of returning tokens
+    cookieManager.setAuthCookies(res, {
+      accessToken: tokenData.accessToken,
+      refreshToken: tokenData.refreshToken,
+      rememberMe: true, // Preserve remember me state
+    });
+
+    res.success(200, { message: "Token refreshed successfully" });
   } catch (error) {
+    // Clear cookies on refresh error
+    cookieManager.clearAuthCookies(res);
     res.error(403, error.message);
   }
 };
 
 exports.logout = async (req, res) => {
   try {
-    const result = await authService.logout(req.body.refreshToken);
-    res.success(200, result);
+    // Get refresh token from cookies
+    const refreshToken = cookieManager.getRefreshToken(req);
+
+    // Clear authentication cookies FIRST (most important step)
+    cookieManager.clearAuthCookies(res);
+
+    // Then handle database cleanup (less critical)
+    if (refreshToken) {
+      try {
+        await authService.logout(refreshToken);
+      } catch (dbError) {
+        // Log but don't fail logout if DB cleanup fails
+        console.error("DB cleanup failed during logout:", dbError.message);
+      }
+    }
+
+    res.success(200, { message: "Logout successful" });
   } catch (error) {
-    res.error(401, error.message);
+    // Always clear cookies even if something fails
+    cookieManager.clearAuthCookies(res);
+
+    // Don't return error for logout - always succeed from user perspective
+    res.success(200, { message: "Logout completed" });
   }
 };
 
@@ -111,8 +171,19 @@ exports.verifyEmail = async (req, res) => {
     await usersService.update(userId, {
       verifiedAt: new Date(),
     });
-    const { accessToken } = generateAccessToken(userId);
-    return res.success(200, { accessToken });
+
+    // Generate tokens using buildTokenResponse and set as httpOnly cookies
+    const tokenData = await buildTokenResponse({
+      userId,
+      rememberMe: true, // Email verification implies user wants to stay logged in
+    });
+    cookieManager.setAuthCookies(res, {
+      accessToken: tokenData.accessToken,
+      refreshToken: tokenData.refreshToken,
+      rememberMe: true,
+    });
+
+    return res.success(200, { message: "Email verified successfully" });
   } catch (error) {
     res.error(500, error.message);
   }

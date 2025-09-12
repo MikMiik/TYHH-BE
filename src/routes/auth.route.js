@@ -7,12 +7,8 @@ router.post("/login", authValidator.login, authController.login);
 router.post("/google", authController.googleLogin);
 router.post("/register", authValidator.register, authController.register);
 router.get("/me", authController.me);
-router.post(
-  "/refresh-token",
-  authValidator.refreshToken,
-  authController.refreshToken
-);
-router.post("/logout", authValidator.refreshToken, authController.logout);
+router.post("/refresh-token", authController.refreshToken);
+router.post("/logout", authController.logout);
 router.get("/verify-email", authController.verifyEmail);
 router.post("/reset-password", authController.resetPassword);
 router.post(

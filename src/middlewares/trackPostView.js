@@ -1,6 +1,5 @@
 const redisClient = require("@/configs/redis");
 const cookieManager = require("@/configs/cookie");
-const getCurrentUser = require("@/utils/getCurrentUser");
 
 /**
  * Middleware to track post views using Redis and Cookies
@@ -9,7 +8,7 @@ const getCurrentUser = require("@/utils/getCurrentUser");
 const trackPostView = async (req, res, next) => {
   try {
     const postId = req.params.id;
-    const userId = getCurrentUser();
+    const userId = req.userId; // Get from checkAuth middleware instead
 
     // Chỉ track view cho user đã đăng nhập
     if (!userId) {

@@ -69,7 +69,9 @@ const refreshAccessToken = async (refreshTokenString) => {
 };
 
 const logout = async (refreshToken) => {
-  await deleteRefreshToken(refreshToken);
+  if (refreshToken) {
+    await deleteRefreshToken(refreshToken);
+  }
   return {
     message: "Logout successfully",
   };
@@ -198,8 +200,6 @@ const checkKey = async (userId, key) => {
     if (user.activeKey) {
       throw new Error("Key already activated");
     }
-
-    console.log(user.key);
 
     if (user.key !== key) {
       throw new Error("Invalid key");
