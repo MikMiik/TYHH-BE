@@ -123,6 +123,52 @@ class CookieManager {
   getRefreshToken(req) {
     return this.getCookie(req, "refreshToken");
   }
+
+  // Livestream tracking methods
+  getViewedLivestreams(req) {
+    try {
+      const viewedLivestreamsStr = this.getCookie(req, "viewedLivestreams");
+      return viewedLivestreamsStr ? JSON.parse(viewedLivestreamsStr) : [];
+    } catch (error) {
+      console.error("Error getting viewed livestreams:", error.message);
+      return [];
+    }
+  }
+
+  hasViewedLivestream(req, livestreamId) {
+    try {
+      const viewedLivestreams = this.getViewedLivestreams(req);
+      return viewedLivestreams.includes(livestreamId.toString());
+    } catch (error) {
+      console.error("Error checking viewed livestream:", error.message);
+      return false;
+    }
+  }
+
+  addViewedLivestream(res, req, livestreamId) {
+    try {
+      const viewedLivestreams = this.getViewedLivestreams(req);
+      if (!viewedLivestreams.includes(livestreamId.toString())) {
+        viewedLivestreams.push(livestreamId.toString());
+        // Keep only last 100 viewed livestreams to prevent cookie from getting too large
+        if (viewedLivestreams.length > 100) {
+          viewedLivestreams.shift();
+        }
+        this.setCookie(
+          res,
+          "viewedLivestreams",
+          JSON.stringify(viewedLivestreams),
+          {
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          }
+        );
+      }
+      return true;
+    } catch (error) {
+      console.error("Error adding viewed livestream:", error.message);
+      return false;
+    }
+  }
 }
 
 module.exports = new CookieManager();

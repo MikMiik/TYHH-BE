@@ -12,7 +12,9 @@ class RedisClient {
         // URL format hoặc object config
         url:
           process.env.REDIS_URL ||
-          `redis://${process.env.REDIS_HOST || "localhost"}:${process.env.REDIS_PORT || 6379}`,
+          `redis://${process.env.REDIS_HOST || "localhost"}:${
+            process.env.REDIS_PORT || 6379
+          }`,
 
         // Database selection
         database: parseInt(process.env.REDIS_DB || "0"),
@@ -190,6 +192,21 @@ class RedisClient {
       return result;
     } catch (error) {
       console.error("❌ Redis INCR error:", error.message);
+      return 0;
+    }
+  }
+
+  async decr(key) {
+    if (!this.isReady()) {
+      console.warn("⚠️ Redis not ready, skipping DECR for key:", key);
+      return 0;
+    }
+
+    try {
+      const result = await this.client.decr(key);
+      return result;
+    } catch (error) {
+      console.error("❌ Redis DECR error:", error.message);
       return 0;
     }
   }
