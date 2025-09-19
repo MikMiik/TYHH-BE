@@ -5,6 +5,14 @@ exports.getProfile = async (req, res) => {
   res.success(200, user);
 };
 
+exports.getUserByUsername = async (req, res) => {
+  const user = await userService.getUserByUsername(req.params.username);
+  if (!user) {
+    return res.error(404, "User not found");
+  }
+  res.success(200, user);
+};
+
 exports.updateProfile = async (req, res) => {
   const { confirmPassword, oldPassword, ...data } = req.body;
   const user = await userService.update(req.params.id, data);

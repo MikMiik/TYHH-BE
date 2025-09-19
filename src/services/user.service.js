@@ -27,6 +27,28 @@ class UsersService {
     return user;
   }
 
+  async getUserByUsername(username) {
+    const user = await User.findOne({
+      where: {
+        username,
+      },
+      attributes: [
+        "id",
+        "email",
+        "name",
+        "username",
+        "avatar",
+        "role",
+        "status",
+        "verifiedAt",
+        "createdAt",
+        "updatedAt",
+      ],
+    });
+
+    return user;
+  }
+
   async getUserKey(id) {
     const user = await User.findByPk(id, {
       attributes: ["key"],
@@ -73,7 +95,15 @@ class UsersService {
       where: {
         [Op.or]: [{ id }, { username: id }],
       },
-      attributes: ["id", "email", "name", "username", "avatar", "activeKey"],
+      attributes: [
+        "id",
+        "email",
+        "name",
+        "username",
+        "avatar",
+        "activeKey",
+        "role",
+      ],
     });
 
     return user;

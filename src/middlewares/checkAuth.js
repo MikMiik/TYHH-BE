@@ -1,6 +1,7 @@
 const jwtService = require("@/services/jwt.service");
 const cookieManager = require("@/configs/cookie");
 const isPublicRoute = require("../configs/publicPaths");
+const userService = require("@/services/user.service");
 
 async function checkAuth(req, res, next) {
   try {
@@ -28,6 +29,8 @@ async function checkAuth(req, res, next) {
 
     const payload = jwtService.verifyAccessToken(token);
     req.userId = payload.userId;
+    const user = await userService.getMe(req.userId);
+    req.user = user;
     next();
   } catch (error) {
     return res.error(401, error.message);
