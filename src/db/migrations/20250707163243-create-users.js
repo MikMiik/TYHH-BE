@@ -56,6 +56,7 @@ module.exports = {
       status: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: "active",
       },
       role: {
         type: Sequelize.STRING(20),

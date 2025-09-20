@@ -63,3 +63,16 @@ exports.getAnalytics = async (req, res) => {
   const analytics = await adminUserService.getUsersAnalytics();
   res.success(200, analytics);
 };
+
+exports.setKey = async (req, res) => {
+  const { key } = req.body;
+  const user = await adminUserService.setUserKey(req.params.id, key);
+  res.success(200, user, "User key set successfully");
+};
+
+exports.sendVerificationEmail = async (req, res) => {
+  const result = await adminUserService.sendUserVerificationEmail(
+    req.params.id
+  );
+  res.success(200, result, "Verification email sent successfully");
+};

@@ -1,36 +1,17 @@
 const { User } = require("@/models");
 const { hashPassword } = require("@/utils/bcrytp");
 const { Op } = require("sequelize");
+const { generateMailToken } = require("@/services/jwt.service");
+const generateClientUrl = require("@/utils/generateClientUrl");
+const queue = require("@/utils/queue");
+const sendUnverifiedUserEmail = require("@/utils/sendUnverifiedUserEmail");
 
 class AdminUserService {
-  async getAllUsers({ page, limit, search, role, status }) {
+  async getAllUsers({ page, limit }) {
     const offset = (page - 1) * limit;
 
-    // Build where conditions
-    const whereConditions = {};
-
-    if (search) {
-      whereConditions[Op.or] = [
-        { name: { [Op.iLike]: `%${search}%` } },
-        { email: { [Op.iLike]: `%${search}%` } },
-        { username: { [Op.iLike]: `%${search}%` } },
-      ];
-    }
-
-    if (role) {
-      whereConditions.role = role;
-    }
-
-    if (status) {
-      if (status === "active") {
-        whereConditions.activeKey = true;
-      } else if (status === "inactive") {
-        whereConditions.activeKey = false;
-      }
-    }
-
+    // Không filter gì, chỉ phân trang
     const { count: total, rows: items } = await User.findAndCountAll({
-      where: whereConditions,
       limit,
       offset,
       order: [["createdAt", "DESC"]],
@@ -71,6 +52,8 @@ class AdminUserService {
         "avatar",
         "role",
         "activeKey",
+        "key",
+        "status",
         "verifiedAt",
         "facebook",
         "phone",
@@ -90,31 +73,61 @@ class AdminUserService {
   }
 
   async createUser(userData) {
-    const { name, email, username, password, role = "user" } = userData;
+    const { sequelize } = require("@/models");
+    const t = await sequelize.transaction();
 
-    // Check if user already exists
-    const existingUser = await User.findOne({
-      where: {
-        [Op.or]: [{ email }, { username }],
-      },
-    });
+    try {
+      const {
+        name,
+        email,
+        username,
+        password,
+        role = "user",
+        ...otherData
+      } = userData;
 
-    if (existingUser) {
-      throw new Error("User with this email or username already exists");
+      // Check if user already exists
+      const existingUser = await User.findOne({
+        where: {
+          [Op.or]: [{ email }, { username }],
+        },
+      });
+
+      if (existingUser) {
+        throw new Error("User with this email or username already exists");
+      }
+
+      // Create user with hashed password (model hook will handle hashing)
+      const user = await User.create(
+        {
+          name,
+          email,
+          username,
+          password, // Will be hashed by model hook
+          role,
+          activeKey: false,
+          status: "active", // Default status for admin-created users
+          ...otherData, // Include additional fields like phone, yearOfBirth, etc.
+        },
+        { transaction: t }
+      );
+
+      // Send verification email using the same logic as auth service
+      await sendUnverifiedUserEmail(user.id, "login", t);
+
+      await t.commit();
+
+      // Return user without sensitive data
+      const {
+        password: _,
+        key: __,
+        ...userWithoutSensitiveData
+      } = user.toJSON();
+      return userWithoutSensitiveData;
+    } catch (error) {
+      await t.rollback();
+      throw error;
     }
-
-    const user = await User.create({
-      name,
-      email,
-      username,
-      password, // Will be hashed by model hook
-      role,
-      activeKey: true,
-    });
-
-    // Return user without sensitive data
-    const { password: _, key: __, ...userWithoutSensitiveData } = user.toJSON();
-    return userWithoutSensitiveData;
   }
 
   async updateUser(id, userData) {
@@ -218,6 +231,55 @@ class AdminUserService {
       users: regularUsers,
       recentRegistrations,
       monthlyRegistrations,
+    };
+  }
+
+  async setUserKey(userId, key) {
+    // Generate random key if not provided
+    const userKey = key || Math.random().toString(36).substring(2, 12);
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const updatedUser = await user.update({
+      key: userKey,
+      activeKey: false, // Reset activeKey when setting new key
+    });
+
+    // Return user without sensitive data
+    const { password, ...userData } = updatedUser.toJSON();
+    return { ...userData, key: userKey };
+  }
+
+  async sendUserVerificationEmail(userId) {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.verifiedAt) {
+      throw new Error("User already verified");
+    }
+
+    // Generate verification token
+    const tokenData = generateMailToken(userId);
+    const verificationUrl = generateClientUrl("verify-email", {
+      token: tokenData.token,
+    });
+
+    // Send verification email via queue
+    queue.dispatch("sendVerifyEmailJob", {
+      userId: user.id,
+      email: user.email,
+      token: tokenData.token,
+      verificationUrl,
+    });
+
+    return {
+      message: "Verification email sent successfully",
+      email: user.email,
     };
   }
 }

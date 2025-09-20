@@ -3,6 +3,7 @@ const adminUserController = require("@/controllers/admin/user.controller");
 const adminCourseController = require("@/controllers/admin/course.controller");
 const adminLivestreamController = require("@/controllers/admin/livestream.controller");
 const checkAuth = require("@/middlewares/checkAuth");
+const adminUserValidator = require("@/validators/admin/user.validator");
 const router = express.Router();
 
 // Middleware kiểm tra quyền admin cho tất cả routes
@@ -17,12 +18,39 @@ router.use((req, res, next) => {
 // Admin user management routes
 router.get("/users", adminUserController.getAll);
 router.get("/users/analytics", adminUserController.getAnalytics);
-router.get("/users/:id", adminUserController.getOne);
+router.get(
+  "/users/:id",
+  adminUserValidator.validateId,
+  adminUserController.getOne
+);
 router.get("/users/username/:username", adminUserController.getByUsername);
-router.post("/users", adminUserController.create);
-router.put("/users/:id", adminUserController.update);
-router.delete("/users/:id", adminUserController.delete);
-router.patch("/users/:id/status", adminUserController.toggleStatus);
+router.post("/users", adminUserValidator.register, adminUserController.create);
+router.put(
+  "/users/:id",
+  adminUserValidator.validateId,
+  adminUserValidator.update,
+  adminUserController.update
+);
+router.delete(
+  "/users/:id",
+  adminUserValidator.validateId,
+  adminUserController.delete
+);
+router.patch(
+  "/users/:id/status",
+  adminUserValidator.validateId,
+  adminUserController.toggleStatus
+);
+router.post(
+  "/users/:id/set-key",
+  adminUserValidator.validateId,
+  adminUserController.setKey
+);
+router.post(
+  "/users/:id/send-verification",
+  adminUserValidator.validateId,
+  adminUserController.sendVerificationEmail
+);
 
 // Admin course management routes
 router.get("/courses", adminCourseController.getAll);

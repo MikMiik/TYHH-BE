@@ -29,7 +29,11 @@ module.exports = (sequelize, DataTypes) => {
       school: { type: DataTypes.STRING(100), allowNull: true },
       phone: { type: DataTypes.STRING(20), allowNull: true, unique: true },
       facebook: { type: DataTypes.STRING(191), allowNull: true, unique: true },
-      status: { type: DataTypes.STRING(20), allowNull: true },
+      status: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+        defaultValue: "active",
+      },
       role: { type: DataTypes.STRING(20), defaultValue: "user" },
       point: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
       googleId: { type: DataTypes.STRING(255), allowNull: true },
