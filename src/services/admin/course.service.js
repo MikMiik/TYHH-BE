@@ -152,7 +152,7 @@ class AdminCourseService {
             model: CourseOutline,
             as: "outlines",
             attributes: ["id", "title", "slug"],
-            order: [["id", "ASC"]], // or order field if exists
+            // order removed, sort after fetch if needed
           },
           {
             model: Topic,
@@ -165,7 +165,6 @@ class AdminCourseService {
             as: "students",
             attributes: ["id", "name", "email"],
             through: { attributes: ["createdAt"] },
-            limit: 100, // Prevent loading too many students
           },
         ],
       });
@@ -200,7 +199,6 @@ class AdminCourseService {
             model: CourseOutline,
             as: "outlines",
             attributes: ["id", "title", "slug"],
-            order: [["id", "ASC"]], // or order field if exists
           },
           {
             model: Topic,
@@ -213,7 +211,6 @@ class AdminCourseService {
             as: "students",
             attributes: ["id", "name", "email"],
             through: { attributes: ["createdAt"] },
-            limit: 100, // Prevent loading too many students
           },
         ],
       });
