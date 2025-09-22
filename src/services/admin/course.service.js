@@ -9,12 +9,13 @@ class AdminCourseService {
     search,
     teacherId,
     isFree,
-    group,
+    topicId,
   }) {
     const offset = (page - 1) * limit;
 
     // Build where conditions
     const whereConditions = {};
+    const includeConditions = [];
 
     if (search) {
       whereConditions[Op.or] = [
@@ -31,8 +32,23 @@ class AdminCourseService {
       whereConditions.isFree = isFree;
     }
 
-    if (group) {
-      whereConditions.group = group;
+    // Filter by topic if provided
+    if (topicId) {
+      includeConditions.push({
+        model: Topic,
+        as: "topics",
+        where: { id: topicId },
+        attributes: ["id", "title"],
+        through: { attributes: [] },
+      });
+    } else {
+      // Include all topics if no filter
+      includeConditions.push({
+        model: Topic,
+        as: "topics",
+        attributes: ["id", "title"],
+        through: { attributes: [] },
+      });
     }
 
     // Get courses with pagination - sorting will be handled on frontend
@@ -57,8 +73,8 @@ class AdminCourseService {
           as: "teacher",
           attributes: ["id", "name", "email"],
         },
+        ...includeConditions,
       ],
-      group: ["Course.id", "teacher.id"],
       limit,
       offset,
       order: [["createdAt", "DESC"]], // Default order, FE can sort as needed
@@ -70,26 +86,34 @@ class AdminCourseService {
       Course.count({ where: whereConditions }), // total matching search/filter
       Course.count({ where: { ...whereConditions, isFree: true } }), // free courses matching filter
       Course.count({ where: { ...whereConditions, isFree: false } }), // paid courses matching filter
-      Course.findAll({
-        attributes: ["group"],
-        where: { ...whereConditions, group: { [Op.not]: null } },
-        group: ["group"],
-        raw: true,
-      }).then((groups) => groups.length), // unique groups count
+      // Get unique topics from courses
+      Topic.findAll({
+        attributes: ["id", "title"],
+        include: [
+          {
+            model: Course,
+            as: "courses",
+            where: whereConditions,
+            attributes: [],
+            through: { attributes: [] },
+          },
+        ],
+        group: ["Topic.id", "Topic.title"],
+      }).then((topics) => topics.map((topic) => topic.toJSON())), // return topics array
     ]);
 
-    const [totalFiltered, freeCount, paidCount, groupCount] = statsPromises;
+    const [totalFiltered, freeCount, paidCount, topics] = statsPromises;
 
     return {
       courses,
       total: totalFiltered,
       currentPage: page,
       totalPages: Math.ceil(totalFiltered / limit),
+      topics, // return available topics
       stats: {
         total: totalFiltered,
         free: freeCount,
         paid: paidCount,
-        groups: groupCount,
       },
     };
   }

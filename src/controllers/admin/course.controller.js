@@ -1,16 +1,29 @@
 const adminCourseService = require("@/services/admin/course.service");
 
 exports.getAll = async (req, res) => {
-  const { page = 1, limit = 10, search, status, topic } = req.query;
+  const {
+    page = 1,
+    limit = 10,
+    search,
+    teacherId,
+    isFree,
+    topicId,
+  } = req.query;
   const pageNum = isNaN(+page) ? 1 : +page;
   const limitNum = isNaN(+limit) ? 10 : +limit;
+
+  // Parse boolean parameter properly
+  let isFreeParam = undefined;
+  if (isFree === "true") isFreeParam = true;
+  else if (isFree === "false") isFreeParam = false;
 
   const data = await adminCourseService.getAllCourses({
     page: pageNum,
     limit: limitNum,
     search,
-    status,
-    topic,
+    teacherId: teacherId ? parseInt(teacherId) : undefined,
+    isFree: isFreeParam,
+    topicId: topicId ? parseInt(topicId) : undefined,
   });
 
   res.success(200, data);
