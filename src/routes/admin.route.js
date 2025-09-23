@@ -3,6 +3,7 @@ const adminUserController = require("@/controllers/admin/user.controller");
 const adminCourseController = require("@/controllers/admin/course.controller");
 const adminLivestreamController = require("@/controllers/admin/livestream.controller");
 const adminDocumentController = require("@/controllers/admin/document.controller");
+const adminDashboardController = require("@/controllers/admin/dashboard.controller");
 const checkAuth = require("@/middlewares/checkAuth");
 const adminUserValidator = require("@/validators/admin/user.validator");
 const router = express.Router();
@@ -76,5 +77,20 @@ router.get("/documents/:id", adminDocumentController.getOne);
 router.post("/documents", adminDocumentController.create);
 router.put("/documents/:id", adminDocumentController.update);
 router.delete("/documents/:id", adminDocumentController.delete);
+
+// Dashboard analytics routes
+router.get("/dashboard", adminDashboardController.getDashboard);
+router.get("/dashboard/overview", adminDashboardController.getOverview);
+router.get("/dashboard/users", adminDashboardController.getUserAnalytics);
+router.get("/dashboard/courses", adminDashboardController.getCourseAnalytics);
+router.get(
+  "/dashboard/livestreams",
+  adminDashboardController.getLivestreamAnalytics
+);
+router.get(
+  "/dashboard/documents",
+  adminDashboardController.getDocumentAnalytics
+);
+router.get("/dashboard/growth", adminDashboardController.getGrowthAnalytics);
 
 module.exports = router;
