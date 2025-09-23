@@ -2,6 +2,7 @@ const express = require("express");
 const adminUserController = require("@/controllers/admin/user.controller");
 const adminCourseController = require("@/controllers/admin/course.controller");
 const adminLivestreamController = require("@/controllers/admin/livestream.controller");
+const adminDocumentController = require("@/controllers/admin/document.controller");
 const checkAuth = require("@/middlewares/checkAuth");
 const adminUserValidator = require("@/validators/admin/user.validator");
 const router = express.Router();
@@ -67,5 +68,13 @@ router.get("/livestreams/:id", adminLivestreamController.getOne);
 router.post("/livestreams", adminLivestreamController.create);
 router.put("/livestreams/:id", adminLivestreamController.update);
 router.delete("/livestreams/:id", adminLivestreamController.delete);
+
+// Admin document management routes
+router.get("/documents", adminDocumentController.getAll);
+router.get("/documents/analytics", adminDocumentController.getAnalytics);
+router.get("/documents/:id", adminDocumentController.getOne);
+router.post("/documents", adminDocumentController.create);
+router.put("/documents/:id", adminDocumentController.update);
+router.delete("/documents/:id", adminDocumentController.delete);
 
 module.exports = router;
