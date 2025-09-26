@@ -11,7 +11,7 @@ const { sequelize } = require("@/models");
 const redisClient = require("@/configs/redis");
 
 // RouterImport
-const router = require("@/routes");
+const router = require("@/routes/api");
 
 // MethodOverideImport
 const methodOverride = require("method-override");
