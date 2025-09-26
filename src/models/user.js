@@ -8,12 +8,27 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "teacherId",
         as: "courses",
       });
+
       // Many-to-many: User đăng ký nhiều Course
       User.belongsToMany(models.Course, {
         through: models.CourseUser,
         foreignKey: "userId",
         otherKey: "courseId",
         as: "registeredCourses",
+      });
+
+      // Many-to-many: User có nhiều Role thông qua UserRole
+      User.belongsToMany(models.Role, {
+        through: models.UserRole,
+        foreignKey: "userId",
+        otherKey: "roleId",
+        as: "roles",
+      });
+
+      // Direct association with junction table
+      User.hasMany(models.UserRole, {
+        foreignKey: "userId",
+        as: "userRoles",
       });
     }
   }
@@ -34,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: "active",
       },
-      role: { type: DataTypes.STRING(20), defaultValue: "user" },
+      // role field removed - now using many-to-many relationship through user_role table
       point: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
       googleId: { type: DataTypes.STRING(255), allowNull: true },
       key: { type: DataTypes.STRING(255), allowNull: true },
