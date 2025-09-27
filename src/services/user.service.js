@@ -1,4 +1,4 @@
-const { User, Notification, Setting } = require("@/models");
+const { User, Role, Notification, Setting } = require("@/models");
 const { hashPassword } = require("@/utils/bcrytp");
 const { Op } = require("sequelize");
 class UsersService {
@@ -18,9 +18,19 @@ class UsersService {
         "name",
         "username",
         "avatar",
-        "role",
         "status",
         "verifiedAt",
+      ],
+      include: [
+        {
+          model: Role,
+          as: "roles",
+          attributes: ["id", "name", "displayName"],
+          through: {
+            attributes: ["isActive"],
+            where: { isActive: true },
+          },
+        },
       ],
     });
 
@@ -38,11 +48,21 @@ class UsersService {
         "name",
         "username",
         "avatar",
-        "role",
         "status",
         "verifiedAt",
         "createdAt",
         "updatedAt",
+      ],
+      include: [
+        {
+          model: Role,
+          as: "roles",
+          attributes: ["id", "name", "displayName"],
+          through: {
+            attributes: ["isActive"],
+            where: { isActive: true },
+          },
+        },
       ],
     });
 
@@ -95,14 +115,17 @@ class UsersService {
       where: {
         [Op.or]: [{ id }, { username: id }],
       },
-      attributes: [
-        "id",
-        "email",
-        "name",
-        "username",
-        "avatar",
-        "activeKey",
-        "role",
+      attributes: ["id", "email", "name", "username", "avatar", "activeKey"],
+      include: [
+        {
+          model: Role,
+          as: "roles",
+          attributes: ["id", "name", "displayName"],
+          through: {
+            attributes: ["isActive"],
+            where: { isActive: true },
+          },
+        },
       ],
     });
 

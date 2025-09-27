@@ -4,7 +4,6 @@ const router = express.Router();
 // const productsRouter = require("./products.route");
 const authRouter = require("./auth.route");
 const userRouter = require("./user.route");
-const adminRouter = require("../admin.route");
 const cityRouter = require("./city.route");
 const imagekitRouter = require("./imagekit.route");
 const socialRouter = require("./social.route");
@@ -16,7 +15,6 @@ const livestreamRouter = require("./livestream.route");
 
 router.use("/auth", authRouter);
 router.use("/users", userRouter);
-router.use("/admin", adminRouter);
 router.use("/imagekit", imagekitRouter);
 router.use("/socials", socialRouter);
 router.use("/cities", cityRouter);

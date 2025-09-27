@@ -11,10 +11,17 @@ const router = express.Router();
 // Middleware kiểm tra quyền admin cho tất cả routes
 router.use(checkAuth);
 router.use((req, res, next) => {
-  if (req.user?.role !== "admin") {
-    return res.error(403, "Access denied. Admin role required.");
+  // Check if user has admin role through new role system
+  if (req.userRoles && req.userRoles.includes("admin")) {
+    return next();
   }
-  next();
+
+  // Fallback: check legacy role field (for backward compatibility during transition)
+  if (req.user?.role === "admin") {
+    return next();
+  }
+
+  return res.error(403, "Access denied. Admin role required.");
 });
 
 // Admin user management routes

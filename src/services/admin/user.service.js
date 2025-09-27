@@ -1,4 +1,4 @@
-const { User } = require("@/models");
+const { User, Role } = require("@/models");
 const { hashPassword } = require("@/utils/bcrytp");
 const { Op } = require("sequelize");
 const { generateMailToken } = require("@/services/jwt.service");
@@ -50,7 +50,6 @@ class AdminUserService {
         "name",
         "username",
         "avatar",
-        "role",
         "activeKey",
         "key",
         "status",
@@ -62,6 +61,17 @@ class AdminUserService {
         "school",
         "createdAt",
         "updatedAt",
+      ],
+      include: [
+        {
+          model: Role,
+          as: "roles",
+          attributes: ["id", "name", "displayName"],
+          through: {
+            attributes: ["isActive"],
+            where: { isActive: true },
+          },
+        },
       ],
     });
 
@@ -82,7 +92,7 @@ class AdminUserService {
         email,
         username,
         password,
-        role = "user",
+        roleName = "user", // Renamed from role to roleName for clarity
         ...otherData
       } = userData;
 
@@ -97,14 +107,22 @@ class AdminUserService {
         throw new Error("User with this email or username already exists");
       }
 
-      // Create user with hashed password (model hook will handle hashing)
+      // Find the role by name
+      const role = await Role.findOne({
+        where: { name: roleName, isActive: true },
+      });
+
+      if (!role) {
+        throw new Error(`Role '${roleName}' not found`);
+      }
+
+      // Create user without role column
       const user = await User.create(
         {
           name,
           email,
           username,
           password, // Will be hashed by model hook
-          role,
           activeKey: false,
           status: "active", // Default status for admin-created users
           ...otherData, // Include additional fields like phone, yearOfBirth, etc.
@@ -112,18 +130,34 @@ class AdminUserService {
         { transaction: t }
       );
 
+      // Assign role to user via UserRole junction table
+      await user.addRole(role, {
+        through: { isActive: true },
+        transaction: t,
+      });
+
       // Send verification email using the same logic as auth service
       await sendUnverifiedUserEmail(user.id, "login", t);
 
       await t.commit();
 
-      // Return user without sensitive data
-      const {
-        password: _,
-        key: __,
-        ...userWithoutSensitiveData
-      } = user.toJSON();
-      return userWithoutSensitiveData;
+      // Return user without sensitive data and include roles
+      const userWithRoles = await User.findByPk(user.id, {
+        attributes: { exclude: ["password", "key"] },
+        include: [
+          {
+            model: Role,
+            as: "roles",
+            attributes: ["id", "name", "displayName"],
+            through: {
+              attributes: ["isActive"],
+              where: { isActive: true },
+            },
+          },
+        ],
+      });
+
+      return userWithRoles;
     } catch (error) {
       await t.rollback();
       throw error;
@@ -201,9 +235,36 @@ class AdminUserService {
       User.count(),
       User.count({ where: { activeKey: true } }),
       User.count({ where: { activeKey: false } }),
-      User.count({ where: { role: "admin" } }),
-      User.count({ where: { role: "teacher" } }),
-      User.count({ where: { role: "user" } }),
+      // Count users with admin role
+      User.count({
+        include: [
+          {
+            model: Role,
+            as: "roles",
+            where: { name: "admin" },
+          },
+        ],
+      }),
+      // Count users with teacher role
+      User.count({
+        include: [
+          {
+            model: Role,
+            as: "roles",
+            where: { name: "teacher" },
+          },
+        ],
+      }),
+      // Count users with user role
+      User.count({
+        include: [
+          {
+            model: Role,
+            as: "roles",
+            where: { name: "user" },
+          },
+        ],
+      }),
       // Recent registrations (last 7 days)
       User.count({
         where: {

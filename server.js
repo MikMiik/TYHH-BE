@@ -12,6 +12,7 @@ const redisClient = require("@/configs/redis");
 
 // RouterImport
 const router = require("@/routes/api");
+const adminRouter = require("@/routes/admin");
 
 // MethodOverideImport
 const methodOverride = require("method-override");
@@ -67,6 +68,7 @@ app.set("layout", "./layouts/default");
 
 // Router
 app.use("/api/v1", checkAuth, setContext, router);
+app.use("/admin", checkAuth, setContext, adminRouter);
 
 // ErrorHandle
 app.use(notFoundHandler);

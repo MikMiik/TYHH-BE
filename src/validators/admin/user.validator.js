@@ -75,7 +75,7 @@ exports.register = [
           "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
       },
     },
-    role: {
+    roleName: {
       notEmpty: {
         errorMessage: "Vui lòng chọn vai trò.",
       },
@@ -225,7 +225,7 @@ exports.update = [
           "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
       },
     },
-    role: {
+    roleName: {
       optional: true,
       notEmpty: {
         errorMessage: "Vai trò không được để trống.",
