@@ -4,12 +4,6 @@ const { User } = require("@/models");
 const { Op } = require("sequelize");
 const { comparePassword } = require("@/utils/bcrytp");
 
-/**
- * Edit profile validation
- * - Validates profile fields and ensures unique username/email/phone excluding current user id
- * - If any of the password fields (oldPassword/newPassword/confirmPassword) are present,
- *   require and validate them (oldPassword present, newPassword strong, confirmPassword matches)
- */
 exports.updateProfile = [
   checkSchema({
     username: {
@@ -66,22 +60,50 @@ exports.updateProfile = [
     },
     facebook: {
       optional: true,
-      isURL: { errorMessage: "Link Facebook không hợp lệ." },
+      custom: {
+        options: (value) => {
+          if (value == null || value === "") return true;
+          try {
+            new URL(value);
+          } catch {
+            throw new Error("Link Facebook không hợp lệ.");
+          }
+          return true;
+        },
+      },
     },
     yearOfBirth: {
       optional: true,
-      matches: {
-        options: [/^[0-9]{4}$/],
-        errorMessage: "Năm sinh phải có 4 chữ số.",
+      custom: {
+        options: (value) => {
+          if (value == null || value === "") return true;
+          if (!/^[0-9]{4}$/.test(value))
+            throw new Error("Năm sinh phải có 4 chữ số.");
+          return true;
+        },
       },
     },
     city: {
       optional: true,
-      isString: { errorMessage: "Tỉnh/thành không hợp lệ." },
+      custom: {
+        options: (value) => {
+          if (value == null || value === "") return true;
+          if (typeof value !== "string")
+            throw new Error("Tỉnh/thành không hợp lệ.");
+          return true;
+        },
+      },
     },
     school: {
       optional: true,
-      isString: { errorMessage: "Trường học không hợp lệ." },
+      custom: {
+        options: (value) => {
+          if (value == null || value === "") return true;
+          if (typeof value !== "string")
+            throw new Error("Trường học không hợp lệ.");
+          return true;
+        },
+      },
     },
 
     // Password fields: only required/validated when any password field is present
