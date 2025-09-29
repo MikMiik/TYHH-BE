@@ -68,7 +68,7 @@ app.set("layout", "./layouts/default");
 
 // Router
 app.use("/api/v1", auth, setContext, router);
-app.use("/admin", auth, setContext, adminRouter);
+app.use("/admin", setContext, adminRouter);
 
 // ErrorHandle
 app.use(notFoundHandler);

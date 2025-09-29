@@ -1,18 +1,22 @@
 const express = require("express");
-const { requireAdmin } = require("@/middlewares/auth");
 const router = express.Router();
+const { auth, requireAdmin } = require("@/middlewares/auth");
 
 // Import các route modules
+const authRouter = require("./auth.route");
 const userRouter = require("./user.route");
 const courseRouter = require("./course.route");
 const livestreamRouter = require("./livestream.route");
 const documentRouter = require("./document.route");
 const dashboardRouter = require("./dashboard.route");
 
-// Require admin access for all admin routes
-router.use(requireAdmin);
+// Mount auth routes first (auth.route tự handle middleware cho từng endpoint)
+router.use("/auth", authRouter);
 
-// Mount các route modules
+// Apply auth + requireAdmin middleware for all other routes
+router.use(auth, requireAdmin);
+
+// Mount protected admin route modules
 router.use("/users", userRouter);
 router.use("/courses", courseRouter);
 router.use("/livestreams", livestreamRouter);

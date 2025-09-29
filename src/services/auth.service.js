@@ -299,6 +299,26 @@ const checkKey = async (userId, key) => {
   }
 };
 
+// Check if user is admin
+const checkIsAdmin = (user) => {
+  if (!user) return false;
+
+  // Method 1: Role-based (preferred)
+  if (user.roles?.some((role) => role.name === "admin")) return true;
+
+  // Method 2: Legacy role field
+  if (user.role === "admin") return true;
+
+  // Method 3: Environment usernames
+  const adminUsernames = process.env.ADMIN_USERNAMES?.split(",") || ["admin"];
+  if (adminUsernames.includes(user.username)) return true;
+
+  // Method 4: Email domain
+  if (user.email?.endsWith(process.env.ADMIN_EMAIL_DOMAIN)) return true;
+
+  return false;
+};
+
 module.exports = {
   register,
   login,
@@ -310,4 +330,5 @@ module.exports = {
   changePassword,
   googleLogin,
   checkKey,
+  checkIsAdmin,
 };
