@@ -1,76 +1,15 @@
 /**
- * Centralized Permissions Configuration
- * Quản lý tập trung tất cả permissions trong hệ thống
+ * Simplified Permissions Configuration
+ * Chỉ quản lý permissions cho TEACHER và USER
+ * ADMIN sẽ được xử lý riêng qua middleware isAdmin check
  *
  * Format: MODULE.ENTITY.ACTION
- * - MODULE: admin, teacher, user, public
- * - ENTITY: users, courses, livestreams, documents, dashboard, etc.
- * - ACTION: list, view, create, update, delete, manage, analytics, etc.
+ * - MODULE: teacher, user, public
+ * - ENTITY: courses, livestreams, documents, profile, etc.
+ * - ACTION: create, view, update, delete, manage, enroll, etc.
  */
 
 const PERMISSIONS = {
-  // ===== SYSTEM PERMISSIONS =====
-  SYSTEM: {
-    ADMIN: "system.admin", // Toàn quyền quản trị hệ thống
-  },
-
-  // ===== ADMIN PERMISSIONS =====
-  ADMIN: {
-    // User Management
-    USERS: {
-      LIST: "admin.users.list",
-      VIEW: "admin.users.view",
-      CREATE: "admin.users.create",
-      UPDATE: "admin.users.update",
-      DELETE: "admin.users.delete",
-      TOGGLE_STATUS: "admin.users.toggle_status",
-      SET_KEY: "admin.users.set_key",
-      SEND_VERIFICATION: "admin.users.send_verification",
-      ANALYTICS: "admin.users.analytics",
-    },
-
-    // Course Management
-    COURSES: {
-      LIST: "admin.courses.list",
-      VIEW: "admin.courses.view",
-      CREATE: "admin.courses.create",
-      UPDATE: "admin.courses.update",
-      DELETE: "admin.courses.delete",
-      ANALYTICS: "admin.courses.analytics",
-    },
-
-    // Livestream Management
-    LIVESTREAMS: {
-      LIST: "admin.livestreams.list",
-      VIEW: "admin.livestreams.view",
-      CREATE: "admin.livestreams.create",
-      UPDATE: "admin.livestreams.update",
-      DELETE: "admin.livestreams.delete",
-      ANALYTICS: "admin.livestreams.analytics",
-    },
-
-    // Document Management
-    DOCUMENTS: {
-      LIST: "admin.documents.list",
-      VIEW: "admin.documents.view",
-      CREATE: "admin.documents.create",
-      UPDATE: "admin.documents.update",
-      DELETE: "admin.documents.delete",
-      ANALYTICS: "admin.documents.analytics",
-    },
-
-    // Dashboard & Analytics
-    DASHBOARD: {
-      VIEW: "admin.dashboard.view",
-      OVERVIEW: "admin.dashboard.overview",
-      USER_ANALYTICS: "admin.dashboard.user_analytics",
-      COURSE_ANALYTICS: "admin.dashboard.course_analytics",
-      LIVESTREAM_ANALYTICS: "admin.dashboard.livestream_analytics",
-      DOCUMENT_ANALYTICS: "admin.dashboard.document_analytics",
-      GROWTH_ANALYTICS: "admin.dashboard.growth_analytics",
-    },
-  },
-
   // ===== TEACHER PERMISSIONS =====
   TEACHER: {
     // Course Management (Own courses)
@@ -133,42 +72,6 @@ const PERMISSIONS = {
     DOCUMENTS: {
       DOWNLOAD_ALLOWED: "user.documents.download_allowed",
       VIEW_ALLOWED: "user.documents.view_allowed",
-    },
-  },
-
-  // ===== PUBLIC PERMISSIONS =====
-  PUBLIC: {
-    // Public Content Access
-    COURSES: {
-      LIST: "public.courses.list",
-      VIEW: "public.courses.view",
-    },
-
-    DOCUMENTS: {
-      LIST: "public.documents.list",
-      VIEW: "public.documents.view",
-    },
-
-    LIVESTREAMS: {
-      VIEW: "public.livestreams.view",
-      TRACK_VIEW: "public.livestreams.track_view",
-    },
-
-    // Other Public Resources
-    TOPICS: {
-      LIST: "public.topics.list",
-    },
-
-    CITIES: {
-      LIST: "public.cities.list",
-    },
-
-    SCHEDULES: {
-      LIST: "public.schedules.list",
-    },
-
-    SOCIALS: {
-      LIST: "public.socials.list",
     },
   },
 };

@@ -115,7 +115,16 @@ class UsersService {
       where: {
         [Op.or]: [{ id }, { username: id }],
       },
-      attributes: ["id", "email", "name", "username", "avatar", "activeKey"],
+      attributes: [
+        "id",
+        "email",
+        "name",
+        "username",
+        "avatar",
+        "activeKey",
+        "status",
+        "verifiedAt",
+      ],
       include: [
         {
           model: Role,
@@ -125,6 +134,7 @@ class UsersService {
             attributes: ["isActive"],
             where: { isActive: true },
           },
+          required: false, // LEFT JOIN to include users without roles
         },
       ],
     });
@@ -146,13 +156,16 @@ class UsersService {
   }
 
   async update(id, data) {
-    const result = await User.update(
-      {
-        ...data,
-        password: await hashPassword(data.newPassword),
-      },
-      { where: { id } }
-    );
+    const updateData = { ...data };
+
+    // Only hash password if newPassword is provided
+    if (data.newPassword) {
+      updateData.password = await hashPassword(data.newPassword);
+      // Remove newPassword from updateData to avoid saving it
+      delete updateData.newPassword;
+    }
+
+    const result = await User.update(updateData, { where: { id } });
     return result;
   }
 

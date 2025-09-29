@@ -57,11 +57,7 @@ module.exports = {
 
     // Gán quyền mặc định cho các role
     // Lấy ID của các role và permission để gán quyền
-    const roleAdmin = await queryInterface.sequelize.query(
-      "SELECT id FROM roles WHERE name = 'admin'",
-      { type: queryInterface.sequelize.QueryTypes.SELECT }
-    );
-
+    // Chỉ lấy teacher và user roles (admin không cần trong DB)
     const roleTeacher = await queryInterface.sequelize.query(
       "SELECT id FROM roles WHERE name = 'teacher'",
       { type: queryInterface.sequelize.QueryTypes.SELECT }
@@ -77,33 +73,31 @@ module.exports = {
       { type: queryInterface.sequelize.QueryTypes.SELECT }
     );
 
-    if (roleAdmin.length > 0 && roleTeacher.length > 0 && roleUser.length > 0) {
-      const adminId = roleAdmin[0].id;
+    if (roleTeacher.length > 0 && roleUser.length > 0) {
       const teacherId = roleTeacher[0].id;
       const userId = roleUser[0].id;
 
-      // Admin có tất cả quyền
-      const adminPermissions = allPermissions.map((permission) => ({
-        roleId: adminId,
-        permissionId: permission.id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }));
-
-      // Teacher có quyền liên quan đến course và livestream
+      // Teacher có tất cả teacher.* permissions
       const teacherPermissionNames = [
-        "course.create",
-        "course.read",
-        "course.update",
-        "course.manage_outline",
-        "livestream.create",
-        "livestream.manage",
-        "livestream.view",
-        "document.upload",
-        "document.download",
-        "document.manage",
-        "user.read", // Teacher có thể xem thông tin học viên
+        "teacher.courses.create",
+        "teacher.courses.manage_own",
+        "teacher.courses.view_own",
+        "teacher.courses.update_own",
+        "teacher.courses.delete_own",
+        "teacher.livestreams.create",
+        "teacher.livestreams.manage_own",
+        "teacher.livestreams.view_own",
+        "teacher.livestreams.update_own",
+        "teacher.livestreams.delete_own",
+        "teacher.documents.create",
+        "teacher.documents.manage_own",
+        "teacher.documents.view_own",
+        "teacher.documents.update_own",
+        "teacher.documents.delete_own",
+        "teacher.students.view",
+        "teacher.students.manage",
       ];
+
       const teacherPermissions = allPermissions
         .filter((p) => teacherPermissionNames.includes(p.name))
         .map((permission) => ({
@@ -113,12 +107,20 @@ module.exports = {
           updatedAt: new Date(),
         }));
 
-      // User chỉ có quyền cơ bản
+      // User có tất cả user.* permissions
       const userPermissionNames = [
-        "course.read",
-        "livestream.view",
-        "document.download",
+        "user.profile.view",
+        "user.profile.update",
+        "user.profile.upload_avatar",
+        "user.courses.view_enrolled",
+        "user.courses.enroll",
+        "user.courses.unenroll",
+        "user.livestreams.view_enrolled",
+        "user.livestreams.join",
+        "user.documents.download_allowed",
+        "user.documents.view_allowed",
       ];
+
       const userPermissions = allPermissions
         .filter((p) => userPermissionNames.includes(p.name))
         .map((permission) => ({
@@ -128,12 +130,12 @@ module.exports = {
           updatedAt: new Date(),
         }));
 
-      // Insert tất cả quyền
-      await queryInterface.bulkInsert("role_permission", [
-        ...adminPermissions,
-        ...teacherPermissions,
-        ...userPermissions,
-      ]);
+      // Insert permissions (chỉ teacher và user, không có admin)
+      const allRolePermissions = [...teacherPermissions, ...userPermissions];
+
+      if (allRolePermissions.length > 0) {
+        await queryInterface.bulkInsert("role_permission", allRolePermissions);
+      }
     }
   },
 

@@ -2,8 +2,7 @@ const express = require("express");
 const authController = require("@/controllers/api/auth.controller");
 const router = express.Router();
 const authValidator = require("@/validators/auth.validator");
-const checkAuth = require("@/middlewares/checkAuth");
-const { requirePermission } = require("@/middlewares/checkPermission");
+const { requirePermission } = require("@/middlewares/auth");
 const { validateUserOwnership } = require("@/middlewares/validateOwnership");
 const { PERMISSIONS } = require("@/configs/permissions");
 
@@ -21,14 +20,12 @@ router.get("/verify-reset-token", authController.verifyResetToken);
 // Protected auth routes - cần authentication và permission
 router.get(
   "/me",
-  checkAuth,
   requirePermission(PERMISSIONS.USER.PROFILE.VIEW),
   authController.me
 );
 
 router.post(
   "/change-password/:userId",
-  checkAuth,
   requirePermission(PERMISSIONS.USER.PROFILE.UPDATE),
   validateUserOwnership("userId"),
   authValidator.changePassword,
@@ -37,7 +34,6 @@ router.post(
 
 router.post(
   "/change-email",
-  checkAuth,
   requirePermission(PERMISSIONS.USER.PROFILE.UPDATE),
   authValidator.changeEmail,
   authController.changeEmail
@@ -45,7 +41,6 @@ router.post(
 
 router.post(
   "/check-key",
-  checkAuth,
   requirePermission(PERMISSIONS.USER.PROFILE.VIEW),
   authController.checkKey
 );

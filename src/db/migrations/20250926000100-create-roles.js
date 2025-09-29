@@ -47,20 +47,12 @@ module.exports = {
     await queryInterface.addIndex("roles", ["name"]);
     await queryInterface.addIndex("roles", ["isActive"]);
 
-    // Thêm data mặc định cho các role hiện tại
+    // Thêm data mặc định cho các role (chỉ teacher và user, admin không cần trong DB)
     await queryInterface.bulkInsert("roles", [
-      {
-        name: "admin",
-        displayName: "Quản trị viên",
-        description: "Có toàn quyền quản trị hệ thống",
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
       {
         name: "teacher",
         displayName: "Giáo viên",
-        description: "Có thể tạo và quản lý khóa học, livestream",
+        description: "Có thể tạo và quản lý khóa học, livestream của mình",
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -69,6 +61,14 @@ module.exports = {
         name: "user",
         displayName: "Học viên",
         description: "Có thể đăng ký và tham gia khóa học",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "admin",
+        displayName: "Quản trị viên",
+        description: "Có thể quản lý tất cả các khía cạnh của hệ thống",
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),

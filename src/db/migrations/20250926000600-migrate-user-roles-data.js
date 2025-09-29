@@ -28,16 +28,24 @@ module.exports = {
     users.forEach((user) => {
       let roleId = null;
 
-      // Map role string to role id
-      if (user.role === "admin" && roleMap["admin"]) {
-        roleId = roleMap["admin"];
-      } else if (user.role === "teacher" && roleMap["teacher"]) {
+      // Map role string to role id (chỉ teacher và user)
+      if (user.role === "teacher" && roleMap["teacher"]) {
         roleId = roleMap["teacher"];
       } else if (user.role === "user" && roleMap["user"]) {
         roleId = roleMap["user"];
+      } else if (user.role === "admin") {
+        // Admin users sẽ không được migrate vào database
+        // Admin được handle riêng qua middleware isAdmin check
+        console.log(
+          `Skipping admin user ID ${user.id} - admin roles not stored in DB`
+        );
+        return; // Skip admin users
       } else {
-        // Default to user role if role không hợp lệ
+        // Default to user role nếu role không hợp lệ
         roleId = roleMap["user"];
+        console.log(
+          `Invalid role '${user.role}' for user ID ${user.id}, defaulting to 'user'`
+        );
       }
 
       if (roleId) {

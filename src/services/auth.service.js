@@ -9,12 +9,11 @@ const buildTokenResponse = require("@/utils/buildTokenResponse");
 const generateClientUrl = require("@/utils/generateClientUrl");
 const userService = require("./user.service");
 const queue = require("@/utils/queue");
-const { User } = require("@/models");
+const { User, Role, UserRole, sequelize } = require("@/models");
 const axios = require("axios");
 const { default: slugify } = require("slugify");
 
 const register = async (data) => {
-  const { sequelize } = require("@/models");
   const t = await sequelize.transaction();
   try {
     const user = await userService.create(
@@ -24,6 +23,23 @@ const register = async (data) => {
       },
       { transaction: t }
     );
+
+    // Automatically assign 'user' role to new user
+    const userRole = await Role.findOne({
+      where: { name: "user", isActive: true },
+      transaction: t,
+    });
+
+    if (userRole) {
+      await UserRole.create(
+        {
+          userId: user.id,
+          roleId: userRole.id,
+          isActive: true,
+        },
+        { transaction: t }
+      );
+    }
 
     await sendUnverifiedUserEmail(user.id, "login", t);
     await t.commit();
@@ -41,6 +57,23 @@ const login = async (data) => {
   try {
     const { email, rememberMe } = data;
     const user = await userService.getByEmail(email);
+
+    // Check if user has any roles, if not assign default 'user' role
+    const userWithRoles = await userService.getById(user.id);
+    if (!userWithRoles.roles || userWithRoles.roles.length === 0) {
+      const userRole = await Role.findOne({
+        where: { name: "user", isActive: true },
+      });
+
+      if (userRole) {
+        await UserRole.create({
+          userId: user.id,
+          roleId: userRole.id,
+          isActive: true,
+        });
+      }
+    }
+
     const result = await buildTokenResponse({ userId: user.id, rememberMe });
     await userService.update(user.id, { lastLogin: new Date() });
     return result;
@@ -144,7 +177,7 @@ const changePassword = async (userId, data) => {
   }
 
   const updatedUser = await userService.update(userId, {
-    password: await hashPassword(data.newPassword),
+    newPassword: data.newPassword, // Pass as newPassword for user service to handle
   });
   return updatedUser;
 };
@@ -163,16 +196,62 @@ const googleLogin = async (token) => {
     if (data && data.email_verified) {
       const user = await userService.getByEmail(data.email);
       if (!user) {
-        const newUser = await userService.create({
-          email: data.email,
-          name: data.name,
-          username: slugify(data.name, { lower: true }),
-          avatar: data.picture,
-          googleId: data.sub,
-          verifiedAt: new Date(),
-        });
-        return buildTokenResponse({ userId: newUser.id, rememberMe: true });
+        const t = await sequelize.transaction();
+
+        try {
+          const newUser = await userService.create(
+            {
+              email: data.email,
+              name: data.name,
+              username: slugify(data.name, { lower: true }),
+              avatar: data.picture,
+              googleId: data.sub,
+              verifiedAt: new Date(),
+            },
+            { transaction: t }
+          );
+
+          // Automatically assign 'user' role to new Google user
+          const userRole = await Role.findOne({
+            where: { name: "user", isActive: true },
+            transaction: t,
+          });
+
+          if (userRole) {
+            await UserRole.create(
+              {
+                userId: newUser.id,
+                roleId: userRole.id,
+                isActive: true,
+              },
+              { transaction: t }
+            );
+          }
+
+          await t.commit();
+          return buildTokenResponse({ userId: newUser.id, rememberMe: true });
+        } catch (error) {
+          await t.rollback();
+          throw error;
+        }
       }
+
+      // Check if existing user has roles, if not assign default 'user' role
+      const userWithRoles = await userService.getById(user.id);
+      if (!userWithRoles.roles || userWithRoles.roles.length === 0) {
+        const userRole = await Role.findOne({
+          where: { name: "user", isActive: true },
+        });
+
+        if (userRole) {
+          await UserRole.create({
+            userId: user.id,
+            roleId: userRole.id,
+            isActive: true,
+          });
+        }
+      }
+
       const result = await buildTokenResponse({
         userId: user.id,
         rememberMe: true,

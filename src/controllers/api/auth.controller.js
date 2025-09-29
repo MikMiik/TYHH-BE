@@ -3,7 +3,6 @@ const authService = require("@/services/auth.service");
 const cookieManager = require("@/configs/cookie");
 const buildTokenResponse = require("@/utils/buildTokenResponse");
 const { verifyMailToken } = require("@/services/jwt.service");
-const { hashPassword } = require("@/utils/bcrytp");
 
 exports.login = async (req, res) => {
   try {
@@ -203,8 +202,9 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token } = req.query;
     const { userId } = verifyMailToken(token);
-    const password = await hashPassword(req.body.password);
-    const result = await usersService.update(userId, { password });
+    const result = await usersService.update(userId, {
+      newPassword: req.body.password, // Pass raw password, let service hash it
+    });
     res.success(200, { message: "Reset password successfully" });
   } catch (error) {
     res.error(401, error.message);

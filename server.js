@@ -27,7 +27,7 @@ const expressLayouts = require("express-ejs-layouts");
 const notFoundHandler = require("@/middlewares/notFoundHandler");
 const errorHandler = require("@/middlewares/errorHandler");
 const responseEnhancer = require("@/middlewares/responseEnhancer");
-const checkAuth = require("@/middlewares/checkAuth");
+const { auth } = require("@/middlewares/auth");
 const { setContext } = require("@/middlewares/setContext");
 
 /*------------------------------------------------------------ */
@@ -67,8 +67,8 @@ app.set("views", "./src/views");
 app.set("layout", "./layouts/default");
 
 // Router
-app.use("/api/v1", checkAuth, setContext, router);
-app.use("/admin", checkAuth, setContext, adminRouter);
+app.use("/api/v1", auth, setContext, router);
+app.use("/admin", auth, setContext, adminRouter);
 
 // ErrorHandle
 app.use(notFoundHandler);
