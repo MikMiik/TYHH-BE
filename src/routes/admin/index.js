@@ -9,6 +9,7 @@ const courseRouter = require("./course.route");
 const livestreamRouter = require("./livestream.route");
 const documentRouter = require("./document.route");
 const dashboardRouter = require("./dashboard.route");
+const imagekitRouter = require("./imagekit.route");
 
 // Mount auth routes first (auth.route tự handle middleware cho từng endpoint)
 router.use("/auth", authRouter);
@@ -22,5 +23,6 @@ router.use("/courses", courseRouter);
 router.use("/livestreams", livestreamRouter);
 router.use("/documents", documentRouter);
 router.use("/dashboard", dashboardRouter);
+router.use("/imagekit", imagekitRouter);
 
 module.exports = router;

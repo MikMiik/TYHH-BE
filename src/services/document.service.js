@@ -208,6 +208,51 @@ class DocumentService {
     return document;
   }
 
+  // ADMIN: Get document by ID or slug
+  async getDocumentByIdOrSlug(identifier) {
+    // Check if identifier is numeric (ID)
+    const isNumeric = !isNaN(identifier) && !isNaN(parseFloat(identifier));
+
+    const whereCondition = isNumeric
+      ? { id: identifier }
+      : { slug: identifier };
+
+    const document = await Document.findOne({
+      where: whereCondition,
+      attributes: [
+        "id",
+        "title",
+        "slug",
+        "thumbnail",
+        "downloadCount",
+        "vip",
+        "livestreamId",
+        "createdAt",
+        "updatedAt",
+      ],
+      include: [
+        {
+          model: Livestream,
+          as: "livestream",
+          attributes: ["id", "title", "slug"],
+          include: [
+            {
+              association: "course",
+              attributes: ["id", "title", "slug"],
+            },
+            {
+              association: "courseOutline",
+              attributes: ["id", "title", "slug"],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!document) throw new Error("Document not found");
+    return document;
+  }
+
   // ADMIN: Create document
   async createDocument(documentData) {
     const { title, thumbnail, vip = false, livestreamId } = documentData;

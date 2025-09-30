@@ -22,7 +22,7 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getOne = async (req, res) => {
-  const document = await documentService.getDocumentById(req.params.id);
+  const document = await documentService.getDocumentByIdOrSlug(req.params.id);
   res.success(200, document);
 };
 
