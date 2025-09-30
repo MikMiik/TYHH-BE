@@ -75,7 +75,7 @@ exports.register = [
           "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
       },
     },
-    roleName: {
+    role: {
       notEmpty: {
         errorMessage: "Vui lòng chọn vai trò.",
       },

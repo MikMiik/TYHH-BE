@@ -6,6 +6,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   CourseTopic.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false,
+      },
       courseId: { type: DataTypes.INTEGER, allowNull: false },
       topicId: { type: DataTypes.INTEGER, allowNull: false },
       createdAt: {

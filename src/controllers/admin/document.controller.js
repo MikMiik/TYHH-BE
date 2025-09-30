@@ -1,4 +1,4 @@
-const adminDocumentService = require("@/services/admin/document.service");
+const documentService = require("@/services/document.service");
 
 exports.getAll = async (req, res) => {
   const { page = 1, limit = 10, search, livestreamId, vip } = req.query;
@@ -10,7 +10,7 @@ exports.getAll = async (req, res) => {
   if (vip === "true") vipParam = true;
   else if (vip === "false") vipParam = false;
 
-  const data = await adminDocumentService.getAllDocuments({
+  const data = await documentService.getAllDocumentsAdmin({
     page: pageNum,
     limit: limitNum,
     search,
@@ -22,19 +22,19 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getOne = async (req, res) => {
-  const document = await adminDocumentService.getDocumentById(req.params.id);
+  const document = await documentService.getDocumentById(req.params.id);
   res.success(200, document);
 };
 
 exports.create = async (req, res) => {
   const documentData = req.body;
-  const document = await adminDocumentService.createDocument(documentData);
+  const document = await documentService.createDocument(documentData);
   res.success(201, document, "Document created successfully");
 };
 
 exports.update = async (req, res) => {
   const documentData = req.body;
-  const document = await adminDocumentService.updateDocument(
+  const document = await documentService.updateDocument(
     req.params.id,
     documentData
   );
@@ -42,11 +42,11 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-  await adminDocumentService.deleteDocument(req.params.id);
+  await documentService.deleteDocument(req.params.id);
   res.success(200, null, "Document deleted successfully");
 };
 
 exports.getAnalytics = async (req, res) => {
-  const analytics = await adminDocumentService.getDocumentsAnalytics();
+  const analytics = await documentService.getDocumentsAnalytics();
   res.success(200, analytics);
 };

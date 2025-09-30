@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
   }
   CourseUser.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       courseId: { type: DataTypes.INTEGER, allowNull: false },
       userId: { type: DataTypes.INTEGER, allowNull: false },
       createdAt: {

@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "userId",
         as: "students",
       });
+      // Direct association with CourseUser
+      Course.hasMany(models.CourseUser, {
+        foreignKey: "courseId",
+        as: "CourseUsers",
+      });
     }
   }
   Course.init(

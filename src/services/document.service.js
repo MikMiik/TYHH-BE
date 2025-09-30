@@ -1,13 +1,13 @@
-const { Document, sequelize } = require("../models");
+const { Document, Livestream, Course, CourseOutline, sequelize } = require("../models");
 const { Op } = require("sequelize");
+const { generateUniqueSlug } = require("@/utils/generateUniqueSlug");
 
 class DocumentService {
+  // API: Get all documents (public, filtered)
   async getAllDocuments({ limit, offset, vip, sort = "newest", topic }) {
-    let whereClause = {};
+    let whereClause = { vip };
 
-    whereClause.vip = vip;
-
-    // Xử lý sort order
+    // Sort order
     let orderClause = [];
     switch (sort) {
       case "oldest":
@@ -21,7 +21,8 @@ class DocumentService {
         orderClause = [["createdAt", "DESC"]];
         break;
     }
-    // Nếu có topic filter, sử dụng subquery thay vì nested include
+
+    // Topic filter with subquery
     if (topic) {
       whereClause[Op.and] = [
         sequelize.literal(`
@@ -37,107 +38,240 @@ class DocumentService {
     }
 
     const { count, rows: documents } = await Document.findAndCountAll({
-      where: whereClause,
       limit,
       offset,
+      where: whereClause,
       order: orderClause,
+      distinct: true,
       attributes: [
         "id",
         "title",
-        "thumbnail",
         "slug",
         "downloadCount",
         "vip",
-        "livestreamId",
+        "thumbnail",
         "createdAt",
       ],
-      include: [
-        {
-          association: "livestream",
-          attributes: ["id"],
-          required: false,
-          include: [
-            {
-              association: "course",
-              attributes: ["id"],
-              required: false,
-              include: [
-                {
-                  association: "topics",
-                  attributes: ["id", "title", "slug"],
-                  through: { attributes: [] },
-                  required: false,
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
-
-    // Trả về cấu trúc { documents, totalPages }
-    let docs = documents.map((doc) => {
-      const docJson = doc.toJSON();
-      const { livestream, ...docFields } = docJson;
-      const topics = livestream?.course?.topics || [];
-      return {
-        ...docFields,
-        topics,
-      };
     });
 
     const totalPages = Math.ceil(count / limit);
-    // Nếu page vượt quá totalPages thì trả về mảng rỗng
     if (offset / limit + 1 > totalPages) {
       return { documents: [], totalPages };
     }
-
-    return { documents: docs, totalPages };
+    return { documents, totalPages };
   }
+
+  // API: Get document by slug
   async getDocumentBySlug(slug) {
-    const document = await Document.findOne({
+    return await Document.findOne({
       where: { slug },
-      attributes: [
-        "id",
-        "title",
-        "slug",
-        "downloadCount",
-        "vip",
-        "createdAt",
-        "url",
-        "slidenote",
-      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
       include: [
         {
           association: "livestream",
-          attributes: ["id", "title", "slug", "view"],
-          required: false,
+          attributes: ["id", "title", "slug"],
           include: [
             {
               association: "course",
               attributes: ["id", "title", "slug"],
-              required: false,
-              include: [
-                {
-                  association: "topics",
-                  attributes: ["id", "title", "slug"],
-                  through: { attributes: [] },
-                  required: false,
-                },
-              ],
+              include: [{ association: "teacher", attributes: ["id", "name"] }],
+            },
+          ],
+        },
+      ],
+    });
+  }
+
+  // API: Increment download count
+  async incrementDownloadCount(id) {
+    await Document.increment("downloadCount", { where: { id } });
+    return true;
+  }
+
+  // ADMIN: Get all documents with pagination
+  async getAllDocumentsAdmin({
+    page = 1,
+    limit = 10,
+    search,
+    vip,
+    livestreamId,
+  }) {
+    const offset = (page - 1) * limit;
+    const whereConditions = {};
+
+    if (search) {
+      whereConditions[Op.or] = [{ title: { [Op.like]: `%${search}%` } }];
+    }
+
+    if (typeof vip === "boolean") whereConditions.vip = vip;
+    if (livestreamId) whereConditions.livestreamId = livestreamId;
+
+    const { count: total, rows: items } = await Document.findAndCountAll({
+      where: whereConditions,
+      attributes: [
+        "id",
+        "title",
+        "slug",
+        "thumbnail",
+        "downloadCount",
+        "vip",
+        "livestreamId",
+        "createdAt",
+        "updatedAt",
+      ],
+      include: [
+        {
+          model: Livestream,
+          as: "livestream",
+          attributes: ["id", "title", "slug"],
+          include: [
+            {
+              model: Course,
+              as: "course",
+              attributes: ["id", "title", "slug"],
             },
             {
-              association: "documents",
-              attributes: ["id", "slug", "title"],
-              where: { slug: { [Op.ne]: slug } },
-              required: false,
+              model: CourseOutline,
+              as: "courseOutline",
+              attributes: ["id", "title", "slug"],
+            },
+          ],
+        },
+      ],
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+      distinct: true,
+    });
+
+    // Get stats
+    const [totalDocs, vipDocs, freeDocs, totalDownloads] = await Promise.all([
+      Document.count({ where: whereConditions }),
+      Document.count({ where: { ...whereConditions, vip: true } }),
+      Document.count({ where: { ...whereConditions, vip: false } }),
+      Document.sum("downloadCount", { where: whereConditions }),
+    ]);
+
+    return {
+      items,
+      pagination: {
+        currentPage: page,
+        perPage: limit,
+        total: totalDocs,
+        lastPage: Math.ceil(totalDocs / limit),
+      },
+      stats: {
+        total: totalDocs,
+        vip: vipDocs,
+        free: freeDocs,
+        totalDownloads: totalDownloads || 0,
+      },
+    };
+  }
+
+  // ADMIN: Get document by ID
+  async getDocumentById(id) {
+    const document = await Document.findByPk(id, {
+      attributes: [
+        "id",
+        "title",
+        "slug",
+        "thumbnail",
+        "downloadCount",
+        "vip",
+        "livestreamId",
+        "createdAt",
+        "updatedAt",
+      ],
+      include: [
+        {
+          model: Livestream,
+          as: "livestream",
+          attributes: ["id", "title", "slug"],
+          include: [
+            {
+              association: "course",
+              attributes: ["id", "title", "slug"],
             },
           ],
         },
       ],
     });
 
+    if (!document) throw new Error("Document not found");
     return document;
+  }
+
+  // ADMIN: Create document
+  async createDocument(documentData) {
+    const { title, thumbnail, vip = false, livestreamId } = documentData;
+
+    if (livestreamId) {
+      const livestream = await Livestream.findByPk(livestreamId);
+      if (!livestream) throw new Error("Livestream not found");
+    }
+
+    const slug = await generateUniqueSlug(title, Document);
+
+    const document = await Document.create({
+      title,
+      slug,
+      thumbnail,
+      vip,
+      livestreamId,
+    });
+
+    return await this.getDocumentById(document.id);
+  }
+
+  // ADMIN: Update document
+  async updateDocument(id, documentData) {
+    const document = await Document.findByPk(id);
+    if (!document) throw new Error("Document not found");
+
+    const { title, thumbnail, vip, livestreamId } = documentData;
+
+    if (livestreamId && livestreamId !== document.livestreamId) {
+      const livestream = await Livestream.findByPk(livestreamId);
+      if (!livestream) throw new Error("Livestream not found");
+    }
+
+    let updateData = { thumbnail, vip, livestreamId };
+
+    if (title && title !== document.title) {
+      updateData.title = title;
+      updateData.slug = await generateUniqueSlug(title, Document, id);
+    }
+
+    await document.update(updateData);
+    return await this.getDocumentById(id);
+  }
+
+  // ADMIN: Delete document
+  async deleteDocument(id) {
+    const document = await Document.findByPk(id);
+    if (!document) throw new Error("Document not found");
+
+    await document.destroy();
+    return true;
+  }
+
+  // ADMIN: Analytics
+  async getDocumentsAnalytics() {
+    const [totalDocuments, vipDocuments, freeDocuments, totalDownloads] =
+      await Promise.all([
+        Document.count(),
+        Document.count({ where: { vip: true } }),
+        Document.count({ where: { vip: false } }),
+        Document.sum("downloadCount"),
+      ]);
+
+    return {
+      total: totalDocuments,
+      vip: vipDocuments,
+      free: freeDocuments,
+      totalDownloads: totalDownloads || 0,
+    };
   }
 }
 

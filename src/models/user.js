@@ -17,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
         as: "registeredCourses",
       });
 
+      // Direct association with CourseUser
+      User.hasMany(models.CourseUser, {
+        foreignKey: "userId",
+        as: "CourseUsers",
+      });
+
       // Many-to-many: User có nhiều Role thông qua UserRole
       User.belongsToMany(models.Role, {
         through: models.UserRole,

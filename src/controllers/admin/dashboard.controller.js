@@ -1,8 +1,8 @@
-const adminDashboardService = require("@/services/admin/dashboard.service");
+const dashboardService = require("@/services/dashboard.service");
 
 exports.getDashboard = async (req, res) => {
   try {
-    const dashboardData = await adminDashboardService.getDashboardData();
+    const dashboardData = await dashboardService.getDashboardData();
     res.success(200, dashboardData);
   } catch (error) {
     console.error("Dashboard error:", error);
@@ -12,7 +12,7 @@ exports.getDashboard = async (req, res) => {
 
 exports.getOverview = async (req, res) => {
   try {
-    const overview = await adminDashboardService.getOverviewStats();
+    const overview = await dashboardService.getOverviewStats();
     res.success(200, overview);
   } catch (error) {
     console.error("Overview error:", error);
@@ -22,7 +22,8 @@ exports.getOverview = async (req, res) => {
 
 exports.getUserAnalytics = async (req, res) => {
   try {
-    const userAnalytics = await adminDashboardService.getUserAnalytics();
+    const { period = "week" } = req.query;
+    const userAnalytics = await dashboardService.getUserGrowthStats(period);
     res.success(200, userAnalytics);
   } catch (error) {
     console.error("User analytics error:", error);
@@ -32,7 +33,7 @@ exports.getUserAnalytics = async (req, res) => {
 
 exports.getCourseAnalytics = async (req, res) => {
   try {
-    const courseAnalytics = await adminDashboardService.getCourseAnalytics();
+    const courseAnalytics = await dashboardService.getCourseEnrollmentStats();
     res.success(200, courseAnalytics);
   } catch (error) {
     console.error("Course analytics error:", error);
@@ -42,20 +43,17 @@ exports.getCourseAnalytics = async (req, res) => {
 
 exports.getLivestreamAnalytics = async (req, res) => {
   try {
-    const livestreamAnalytics =
-      await adminDashboardService.getLivestreamAnalytics();
-    res.success(200, livestreamAnalytics);
+    const livestreamAnalytics = await dashboardService.getPopularContent();
+    res.success(200, { livestreams: livestreamAnalytics.livestreams });
   } catch (error) {
     console.error("Livestream analytics error:", error);
     res.error(500, "Failed to get livestream analytics", error.message);
   }
 };
-
 exports.getDocumentAnalytics = async (req, res) => {
   try {
-    const documentAnalytics =
-      await adminDashboardService.getDocumentAnalytics();
-    res.success(200, documentAnalytics);
+    const documentAnalytics = await dashboardService.getPopularContent();
+    res.success(200, { documents: documentAnalytics.documents });
   } catch (error) {
     console.error("Document analytics error:", error);
     res.error(500, "Failed to get document analytics", error.message);
@@ -64,10 +62,32 @@ exports.getDocumentAnalytics = async (req, res) => {
 
 exports.getGrowthAnalytics = async (req, res) => {
   try {
-    const growthAnalytics = await adminDashboardService.getGrowthAnalytics();
+    const { period = "week" } = req.query;
+    const growthAnalytics = await dashboardService.getUserGrowthStats(period);
     res.success(200, growthAnalytics);
   } catch (error) {
     console.error("Growth analytics error:", error);
     res.error(500, "Failed to get growth analytics", error.message);
+  }
+};
+
+exports.getSystemHealth = async (req, res) => {
+  try {
+    const systemHealth = await dashboardService.getSystemHealth();
+    res.success(200, systemHealth);
+  } catch (error) {
+    console.error("System health error:", error);
+    res.error(500, "Failed to get system health", error.message);
+  }
+};
+
+exports.getRevenueStats = async (req, res) => {
+  try {
+    const { period = "month" } = req.query;
+    const revenueStats = await dashboardService.getRevenueStats(period);
+    res.success(200, revenueStats);
+  } catch (error) {
+    console.error("Revenue stats error:", error);
+    res.error(500, "Failed to get revenue stats", error.message);
   }
 };

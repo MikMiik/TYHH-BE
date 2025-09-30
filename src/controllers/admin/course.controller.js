@@ -1,4 +1,4 @@
-const adminCourseService = require("@/services/admin/course.service");
+const courseService = require("@/services/course.service");
 
 exports.getAll = async (req, res) => {
   const {
@@ -17,7 +17,7 @@ exports.getAll = async (req, res) => {
   if (isFree === "true") isFreeParam = true;
   else if (isFree === "false") isFreeParam = false;
 
-  const data = await adminCourseService.getAllCourses({
+  const data = await courseService.getAllCoursesAdmin({
     page: pageNum,
     limit: limitNum,
     search,
@@ -30,31 +30,28 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getOne = async (req, res) => {
-  const course = await adminCourseService.getCourseById(req.params.id);
+  const course = await courseService.getCourseById(req.params.id);
   res.success(200, course);
 };
 
 exports.create = async (req, res) => {
   const courseData = req.body;
-  const course = await adminCourseService.createCourse(courseData);
+  const course = await courseService.createCourse(courseData);
   res.success(201, course, "Course created successfully");
 };
 
 exports.update = async (req, res) => {
   const courseData = req.body;
-  const course = await adminCourseService.updateCourse(
-    req.params.id,
-    courseData
-  );
+  const course = await courseService.updateCourse(req.params.id, courseData);
   res.success(200, course, "Course updated successfully");
 };
 
 exports.delete = async (req, res) => {
-  await adminCourseService.deleteCourse(req.params.id);
+  await courseService.deleteCourse(req.params.id);
   res.success(200, null, "Course deleted successfully");
 };
 
 exports.getAnalytics = async (req, res) => {
-  const analytics = await adminCourseService.getCoursesAnalytics();
+  const analytics = await courseService.getCoursesAnalytics();
   res.success(200, analytics);
 };

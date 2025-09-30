@@ -9,6 +9,11 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "courseId",
         as: "courses",
       });
+      // Direct association with CourseTopic
+      Topic.hasMany(models.CourseTopic, {
+        foreignKey: "topicId",
+        as: "CourseTopics",
+      });
     }
   }
   Topic.init(
