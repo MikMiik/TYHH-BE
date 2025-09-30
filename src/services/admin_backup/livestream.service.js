@@ -1,6 +1,6 @@
 const { Livestream, Course, CourseOutline } = require("@/models");
 const { Op } = require("sequelize");
-const { generateUniqueSlug } = require("@/utils/generateUniqueSlug");
+const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
 class AdminLivestreamService {
   async getAllLivestreams({ page = 1, limit = 10, search, courseId }) {

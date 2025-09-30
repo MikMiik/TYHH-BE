@@ -1,6 +1,6 @@
 const { Course, User, CourseUser, Topic, CourseOutline } = require("@/models");
 const { Op } = require("sequelize");
-const { generateUniqueSlug } = require("@/utils/generateUniqueSlug");
+const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
 class AdminCourseService {
   async getAllCourses({

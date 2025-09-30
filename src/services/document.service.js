@@ -6,7 +6,7 @@ const {
   sequelize,
 } = require("../models");
 const { Op } = require("sequelize");
-const { generateUniqueSlug } = require("@/utils/generateUniqueSlug");
+const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
 class DocumentService {
   // API: Get all documents (public, filtered)

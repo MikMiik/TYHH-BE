@@ -8,8 +8,7 @@ const {
   sequelize,
 } = require("@/models");
 const { Op } = require("sequelize");
-const { generateUniqueSlug } = require("@/utils/generateUniqueSlug");
-const { buildAttributes, buildWhereConditions } = require("./serviceOptions");
+const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
 class CourseService {
   // API: Get all courses (public, filtered)

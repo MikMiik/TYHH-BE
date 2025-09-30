@@ -1,6 +1,6 @@
 const { Document, Livestream } = require("@/models");
 const { Op } = require("sequelize");
-const { generateUniqueSlug } = require("@/utils/generateUniqueSlug");
+const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
 class AdminDocumentService {
   async getAllDocuments({ page = 1, limit = 10, search, livestreamId, vip }) {
