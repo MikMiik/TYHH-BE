@@ -1,4 +1,10 @@
-const { Document, Livestream, Course, CourseOutline, sequelize } = require("../models");
+const {
+  Document,
+  Livestream,
+  Course,
+  CourseOutline,
+  sequelize,
+} = require("../models");
 const { Op } = require("sequelize");
 const { generateUniqueSlug } = require("@/utils/generateUniqueSlug");
 
