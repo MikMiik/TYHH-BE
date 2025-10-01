@@ -8,6 +8,7 @@ const router = express.Router();
 // Admin course management routes (admin bypass applies)
 router.get("/", adminCourseController.getAll);
 router.get("/analytics", adminCourseController.getAnalytics);
+router.get("/teachers", adminCourseController.getTeachers);
 router.get("/:id", adminCourseController.getOne);
 router.post("/", courseValidator.create, adminCourseController.create);
 router.put("/:id", courseValidator.update, adminCourseController.update);
@@ -39,5 +40,17 @@ router.delete("/outlines/:id", courseOutlineController.delete);
 
 // PUT /admin/courses/:courseId/outlines/reorder - Reorder outlines
 router.put("/:courseId/outlines/reorder", courseOutlineController.reorder);
+
+// DELETE /admin/courses/:courseId/students/:userId - Remove student from course
+router.delete(
+  "/:courseId/students/:userId",
+  adminCourseController.removeStudent
+);
+
+// PUT /admin/courses/:courseId/teacher - Update course teacher
+router.put("/:courseId/teacher", adminCourseController.updateTeacher);
+
+// PUT /admin/courses/:courseId/topics - Update course topics
+router.put("/:courseId/topics", adminCourseController.updateTopics);
 
 module.exports = router;

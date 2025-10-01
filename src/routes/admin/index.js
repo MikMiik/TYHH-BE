@@ -6,6 +6,7 @@ const { auth, requireAdmin } = require("@/middlewares/auth");
 const authRouter = require("./auth.route");
 const userRouter = require("./user.route");
 const courseRouter = require("./course.route");
+const topicRouter = require("./topic.route");
 const livestreamRouter = require("./livestream.route");
 const documentRouter = require("./document.route");
 const dashboardRouter = require("./dashboard.route");
@@ -20,6 +21,7 @@ router.use(auth, requireAdmin);
 // Mount protected admin route modules
 router.use("/users", userRouter);
 router.use("/courses", courseRouter);
+router.use("/topics", topicRouter);
 router.use("/livestreams", livestreamRouter);
 router.use("/documents", documentRouter);
 router.use("/dashboard", dashboardRouter);

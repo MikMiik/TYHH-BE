@@ -55,3 +55,28 @@ exports.getAnalytics = async (req, res) => {
   const analytics = await courseService.getCoursesAnalytics();
   res.success(200, analytics);
 };
+
+exports.removeStudent = async (req, res) => {
+  const { courseId, userId } = req.params;
+  await courseService.removeStudentFromCourse(courseId, userId);
+  res.success(200, null, "Student removed from course successfully");
+};
+
+exports.updateTeacher = async (req, res) => {
+  const { courseId } = req.params;
+  const { teacherId } = req.body;
+  const course = await courseService.updateCourseTeacher(courseId, teacherId);
+  res.success(200, course, "Course teacher updated successfully");
+};
+
+exports.updateTopics = async (req, res) => {
+  const { courseId } = req.params;
+  const { topicIds } = req.body;
+  const course = await courseService.updateCourseTopics(courseId, topicIds);
+  res.success(200, course, "Course topics updated successfully");
+};
+
+exports.getTeachers = async (req, res) => {
+  const teachers = await courseService.getAllTeachers();
+  res.success(200, teachers);
+};

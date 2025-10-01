@@ -262,7 +262,7 @@ class CourseService {
         {
           model: User,
           as: "students",
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "name", "email", "username"],
           through: { attributes: ["createdAt"] },
         },
       ],
@@ -446,6 +446,74 @@ class CourseService {
 
     await course.setTopics(topics);
     return true;
+  }
+
+  // ADMIN: Remove student from course
+  async removeStudentFromCourse(courseId, userId) {
+    const course = await Course.findByPk(courseId);
+    if (!course) throw new Error("Course not found");
+
+    const user = await User.findByPk(userId);
+    if (!user) throw new Error("User not found");
+
+    const courseUser = await CourseUser.findOne({
+      where: { courseId, userId },
+    });
+
+    if (!courseUser) {
+      throw new Error("Student is not enrolled in this course");
+    }
+
+    await courseUser.destroy();
+    return true;
+  }
+
+  // ADMIN: Update course teacher
+  async updateCourseTeacher(courseId, teacherId) {
+    const course = await Course.findByPk(courseId);
+    if (!course) throw new Error("Course not found");
+
+    if (teacherId) {
+      const teacher = await User.findByPk(teacherId);
+      if (!teacher) throw new Error("Teacher not found");
+    }
+
+    course.teacherId = teacherId;
+    await course.save();
+
+    return await this.getCourseById(courseId);
+  }
+
+  // ADMIN: Update course topics
+  async updateCourseTopics(courseId, topicIds) {
+    const course = await Course.findByPk(courseId);
+    if (!course) throw new Error("Course not found");
+
+    // Validate all topics exist
+    if (topicIds && topicIds.length > 0) {
+      const topics = await Topic.findAll({
+        where: { id: { [Op.in]: topicIds } },
+      });
+
+      if (topics.length !== topicIds.length) {
+        throw new Error("One or more topics not found");
+      }
+
+      await course.setTopics(topics);
+    } else {
+      // Remove all topics if empty array
+      await course.setTopics([]);
+    }
+
+    return await this.getCourseById(courseId);
+  }
+
+  // ADMIN: Get all available teachers
+  async getAllTeachers() {
+    return await User.findAll({
+      attributes: ["id", "name", "email", "username"],
+      order: [["name", "ASC"]],
+    });
   }
 }
 
