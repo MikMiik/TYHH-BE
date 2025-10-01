@@ -179,6 +179,13 @@ class CourseService {
           as: "teacher",
           attributes: ["id", "name", "email"],
         },
+        {
+          model: CourseOutline,
+          as: "outlines",
+          attributes: ["id", "title", "slug", "order"],
+          separate: true,
+          order: [["order", "ASC"]],
+        },
         ...includeConditions,
       ],
       limit,

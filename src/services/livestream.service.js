@@ -293,6 +293,78 @@ class LivestreamService {
     await livestream.increment("view");
     return true;
   }
+
+  /**
+   * Delete livestream (admin only)
+   */
+  async deleteLivestreamAdmin(id) {
+    const livestream = await Livestream.findByPk(id);
+    if (!livestream) {
+      throw new Error("Livestream not found");
+    }
+
+    await livestream.destroy();
+    return true;
+  }
+
+  /**
+   * Update livestream (admin only)
+   */
+  async updateLivestreamAdmin(id, updateData) {
+    const livestream = await Livestream.findByPk(id, {
+      include: [
+        {
+          model: Course,
+          as: "course",
+          attributes: ["id", "title", "slug"],
+        },
+        {
+          model: CourseOutline,
+          as: "courseOutline",
+          attributes: ["id", "title", "slug"],
+        },
+      ],
+    });
+
+    if (!livestream) {
+      throw new Error("Livestream not found");
+    }
+
+    // Validate course outline belongs to course if both are provided
+    if (updateData.courseId && updateData.courseOutlineId) {
+      const courseOutline = await CourseOutline.findOne({
+        where: {
+          id: updateData.courseOutlineId,
+          courseId: updateData.courseId,
+        },
+      });
+
+      if (!courseOutline) {
+        throw new Error(
+          "Course Outline does not belong to the specified course"
+        );
+      }
+    }
+
+    // Update livestream
+    await livestream.update(updateData);
+
+    // Return updated livestream with associations
+    return await Livestream.findByPk(id, {
+      include: [
+        {
+          model: Course,
+          as: "course",
+          attributes: ["id", "title", "slug"],
+        },
+        {
+          model: CourseOutline,
+          as: "courseOutline",
+          attributes: ["id", "title", "slug"],
+        },
+      ],
+    });
+  }
 }
 
 module.exports = new LivestreamService();
