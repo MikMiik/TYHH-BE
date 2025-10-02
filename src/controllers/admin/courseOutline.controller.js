@@ -1,5 +1,19 @@
 const courseOutlineService = require("@/services/courseOutline.service");
 
+exports.getAllOutlines = async (req, res) => {
+  const { page = 1, limit = 10, search } = req.query;
+  const pageNum = isNaN(+page) ? 1 : +page;
+  const limitNum = isNaN(+limit) ? 10 : +limit;
+
+  const data = await courseOutlineService.getAllOutlinesAcrossCourses({
+    page: pageNum,
+    limit: limitNum,
+    search,
+  });
+
+  res.success(200, data);
+};
+
 exports.getAll = async (req, res) => {
   const { courseId } = req.params;
   const { page = 1, limit = 10, search } = req.query;

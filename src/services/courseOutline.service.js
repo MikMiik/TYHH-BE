@@ -1,4 +1,4 @@
-const { CourseOutline, Course, sequelize } = require("@/models");
+const { CourseOutline, Course, Livestream, sequelize } = require("@/models");
 const { Op } = require("sequelize");
 const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
@@ -43,14 +43,25 @@ class CourseOutlineService {
     };
   }
 
-  // Get single outline by ID
-  async getOutlineById(id) {
-    const outline = await CourseOutline.findByPk(id, {
+  // Get single outline by ID or slug
+  async getOutlineById(identifier) {
+    const whereClause = !isNaN(identifier)
+      ? { id: identifier }
+      : { slug: identifier };
+
+    const outline = await CourseOutline.findOne({
+      where: whereClause,
       include: [
         {
           model: Course,
           as: "course",
-          attributes: ["id", "title", "slug"],
+          attributes: ["id", "title", "slug", "description"],
+        },
+        {
+          model: Livestream,
+          as: "livestreams",
+          attributes: ["id", "title", "slug", "url", "view"],
+          order: [["order", "ASC"]],
         },
       ],
     });
@@ -188,6 +199,43 @@ class CourseOutlineService {
       await transaction.rollback();
       throw new Error(`Failed to reorder outlines: ${error.message}`);
     }
+  }
+
+  // Get all outlines across all courses (for admin overview)
+  async getAllOutlinesAcrossCourses(options = {}) {
+    const { page = 1, limit = 10, search } = options;
+    const offset = (page - 1) * limit;
+
+    const where = {};
+    if (search) {
+      where.title = {
+        [Op.like]: `%${search}%`,
+      };
+    }
+
+    const { count, rows } = await CourseOutline.findAndCountAll({
+      where,
+      include: [
+        {
+          model: Course,
+          as: "course",
+          attributes: ["id", "title", "slug"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+    });
+
+    return {
+      outlines: rows,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(count / limit),
+        totalItems: count,
+        itemsPerPage: parseInt(limit),
+      },
+    };
   }
 }
 
