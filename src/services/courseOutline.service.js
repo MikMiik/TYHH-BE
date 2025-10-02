@@ -60,8 +60,12 @@ class CourseOutlineService {
         {
           model: Livestream,
           as: "livestreams",
-          attributes: ["id", "title", "slug", "url", "view"],
-          order: [["order", "ASC"]],
+          attributes: ["id", "title", "slug", "url", "view", "order"],
+          separate: true,
+          order: [
+            ["order", "ASC"],
+            ["createdAt", "ASC"],
+          ],
         },
       ],
     });
@@ -180,7 +184,22 @@ class CourseOutlineService {
     const transaction = await sequelize.transaction();
 
     try {
-      // Update each outline's order
+      // Get all outline IDs that will be reordered
+      const outlineIds = orders.map(({ id }) => id);
+
+      // Step 1: Set all affected outlines' order to NULL to avoid unique constraint conflicts
+      await CourseOutline.update(
+        { order: null },
+        {
+          where: {
+            id: outlineIds,
+            courseId,
+          },
+          transaction,
+        }
+      );
+
+      // Step 2: Update each outline's order with the new value
       const updatePromises = orders.map(({ id, order }) => {
         return CourseOutline.update(
           { order },

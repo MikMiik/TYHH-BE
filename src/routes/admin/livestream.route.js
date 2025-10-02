@@ -15,6 +15,10 @@ router.put(
 );
 router.delete("/:id", adminLivestreamController.delete);
 
-module.exports = router;
+// Reorder livestreams within a course outline
+router.put(
+  "/course-outline/:courseOutlineId/reorder",
+  adminLivestreamController.reorder
+);
 
 module.exports = router;

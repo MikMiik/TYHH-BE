@@ -295,75 +295,92 @@ class LivestreamService {
   }
 
   /**
-   * Delete livestream (admin only)
+   * Reorder livestreams within a course outline
    */
-  async deleteLivestreamAdmin(id) {
-    const livestream = await Livestream.findByPk(id);
-    if (!livestream) {
-      throw new Error("Livestream not found");
-    }
+  async reorderLivestreams(courseOutlineId, orders) {
+    const { sequelize } = require("../models");
 
-    await livestream.destroy();
-    return true;
-  }
-
-  /**
-   * Update livestream (admin only)
-   */
-  async updateLivestreamAdmin(id, updateData) {
-    const livestream = await Livestream.findByPk(id, {
-      include: [
-        {
-          model: Course,
-          as: "course",
-          attributes: ["id", "title", "slug"],
-        },
-        {
-          model: CourseOutline,
-          as: "courseOutline",
-          attributes: ["id", "title", "slug"],
-        },
-      ],
-    });
-
-    if (!livestream) {
-      throw new Error("Livestream not found");
-    }
-
-    // Validate course outline belongs to course if both are provided
-    if (updateData.courseId && updateData.courseOutlineId) {
-      const courseOutline = await CourseOutline.findOne({
-        where: {
-          id: updateData.courseOutlineId,
-          courseId: updateData.courseId,
-        },
+    try {
+      console.log("🔄 Reorder livestreams started:", {
+        courseOutlineId,
+        orders,
       });
 
+      // Validate course outline exists
+      const courseOutline = await CourseOutline.findByPk(courseOutlineId);
       if (!courseOutline) {
+        throw new Error("Course outline not found");
+      }
+
+      // Get all livestream IDs that will be reordered
+      const livestreamIds = orders.map(({ id }) => id);
+      console.log("📋 Livestream IDs to reorder:", livestreamIds);
+
+      // Verify all livestreams belong to this course outline
+      const existingLivestreams = await Livestream.findAll({
+        where: {
+          id: livestreamIds,
+          courseOutlineId,
+        },
+        attributes: ["id", "title", "order"],
+      });
+
+      console.log(
+        "🔍 Existing livestreams found:",
+        existingLivestreams.map((l) => ({
+          id: l.id,
+          title: l.title,
+          currentOrder: l.order,
+        }))
+      );
+
+      if (existingLivestreams.length !== livestreamIds.length) {
         throw new Error(
-          "Course Outline does not belong to the specified course"
+          "Some livestreams not found or don't belong to this course outline"
         );
       }
+
+      // Use transaction for safer updates
+      const transaction = await sequelize.transaction();
+
+      try {
+        // Method 1: Update one by one with clear logging
+        for (const { id, order } of orders) {
+          console.log(`🔄 Updating livestream ${id} to order ${order}`);
+
+          const result = await Livestream.update(
+            { order },
+            {
+              where: {
+                id,
+                courseOutlineId,
+              },
+              transaction,
+            }
+          );
+
+          console.log(
+            `✅ Updated livestream ${id}, affected rows: ${result[0]}`
+          );
+        }
+
+        await transaction.commit();
+        console.log("✅ Transaction committed successfully");
+        return true;
+      } catch (transactionError) {
+        await transaction.rollback();
+        throw transactionError;
+      }
+    } catch (error) {
+      console.error("❌ Reorder error:", error);
+      console.error("❌ Error details:", {
+        message: error.message,
+        name: error.name,
+        sql: error.sql,
+        original: error.original,
+      });
+      throw new Error(`Failed to reorder livestreams: ${error.message}`);
     }
-
-    // Update livestream
-    await livestream.update(updateData);
-
-    // Return updated livestream with associations
-    return await Livestream.findByPk(id, {
-      include: [
-        {
-          model: Course,
-          as: "course",
-          attributes: ["id", "title", "slug"],
-        },
-        {
-          model: CourseOutline,
-          as: "courseOutline",
-          attributes: ["id", "title", "slug"],
-        },
-      ],
-    });
   }
 }
 

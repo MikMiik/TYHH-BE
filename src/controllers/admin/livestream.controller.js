@@ -45,6 +45,57 @@ exports.delete = async (req, res) => {
   res.success(200, null, "Livestream deleted successfully");
 };
 
+exports.reorder = async (req, res) => {
+  const { courseOutlineId } = req.params;
+  const { orders } = req.body;
+
+  console.log("📨 Reorder request received:", {
+    courseOutlineId: courseOutlineId,
+    courseOutlineIdType: typeof courseOutlineId,
+    orders: orders,
+    ordersLength: orders?.length,
+    body: req.body,
+  });
+
+  // Validate input
+  if (!courseOutlineId) {
+    return res.error(400, null, "Course outline ID is required");
+  }
+
+  if (!orders || !Array.isArray(orders) || orders.length === 0) {
+    return res.error(
+      400,
+      null,
+      "Orders array is required and must not be empty"
+    );
+  }
+
+  // Validate each order item
+  for (let i = 0; i < orders.length; i++) {
+    const order = orders[i];
+    console.log(`📋 Order item ${i}:`, order);
+
+    if (!order.id || typeof order.id !== "number") {
+      return res.error(
+        400,
+        null,
+        `Invalid id at position ${i}: must be a number`
+      );
+    }
+
+    if (typeof order.order !== "number" || order.order < 1) {
+      return res.error(
+        400,
+        null,
+        `Invalid order at position ${i}: must be a positive number`
+      );
+    }
+  }
+
+  await livestreamService.reorderLivestreams(parseInt(courseOutlineId), orders);
+  res.success(200, null, "Livestreams reordered successfully");
+};
+
 exports.getAnalytics = async (req, res) => {
   const analytics = await livestreamService.getLivestreamsAnalytics();
   res.success(200, analytics);
