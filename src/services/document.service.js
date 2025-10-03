@@ -255,7 +255,7 @@ class DocumentService {
 
   // ADMIN: Create document
   async createDocument(documentData) {
-    const { title, thumbnail, vip = false, livestreamId } = documentData;
+    const { title, vip = false, livestreamId } = documentData;
 
     if (livestreamId) {
       const livestream = await Livestream.findByPk(livestreamId);
@@ -267,7 +267,6 @@ class DocumentService {
     const document = await Document.create({
       title,
       slug,
-      thumbnail,
       vip,
       livestreamId,
     });
@@ -280,14 +279,14 @@ class DocumentService {
     const document = await Document.findByPk(id);
     if (!document) throw new Error("Document not found");
 
-    const { title, thumbnail, vip, livestreamId } = documentData;
+    const { title, vip, livestreamId } = documentData;
 
     if (livestreamId && livestreamId !== document.livestreamId) {
       const livestream = await Livestream.findByPk(livestreamId);
       if (!livestream) throw new Error("Livestream not found");
     }
 
-    let updateData = { thumbnail, vip, livestreamId };
+    let updateData = { vip, livestreamId };
 
     if (title && title !== document.title) {
       updateData.title = title;
