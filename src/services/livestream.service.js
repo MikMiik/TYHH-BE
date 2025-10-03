@@ -188,6 +188,17 @@ class LivestreamService {
       }
     }
 
+    // Calculate next order value for the course
+    const maxOrderLivestream = await Livestream.findOne({
+      where: { courseId },
+      order: [["order", "DESC"]],
+      attributes: ["order"],
+    });
+
+    const nextOrder = maxOrderLivestream?.order
+      ? maxOrderLivestream.order + 1
+      : 1;
+
     // Generate unique slug
     const slug = await generateUniqueSlug(title, Livestream);
 
@@ -197,6 +208,7 @@ class LivestreamService {
       url,
       courseId,
       courseOutlineId,
+      order: nextOrder,
       view: 0,
     });
 
