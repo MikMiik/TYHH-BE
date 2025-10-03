@@ -6,8 +6,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   SiteInfo.init(
     {
-      key: { type: DataTypes.STRING(100), allowNull: false, unique: true },
-      value: { type: DataTypes.TEXT, allowNull: true },
+      siteName: { type: DataTypes.STRING(255), allowNull: true },
+      companyName: { type: DataTypes.STRING(255), allowNull: true },
+      email: { type: DataTypes.STRING(255), allowNull: true },
+      taxCode: { type: DataTypes.STRING(50), allowNull: true },
+      phone: { type: DataTypes.STRING(50), allowNull: true },
+      address: { type: DataTypes.TEXT, allowNull: true },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
