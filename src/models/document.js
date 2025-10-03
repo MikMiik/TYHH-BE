@@ -26,6 +26,8 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 0,
       },
+      url: { type: DataTypes.STRING(255), allowNull: true },
+      slidenote: { type: DataTypes.STRING(255), allowNull: true },
       thumbnail: { type: DataTypes.STRING(255), allowNull: true },
       createdAt: {
         type: DataTypes.DATE,

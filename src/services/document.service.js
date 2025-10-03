@@ -119,6 +119,7 @@ class DocumentService {
         "title",
         "slug",
         "thumbnail",
+        "url",
         "downloadCount",
         "vip",
         "livestreamId",
@@ -183,6 +184,7 @@ class DocumentService {
         "title",
         "slug",
         "thumbnail",
+        "url",
         "downloadCount",
         "vip",
         "livestreamId",
@@ -224,6 +226,7 @@ class DocumentService {
         "title",
         "slug",
         "thumbnail",
+        "url",
         "downloadCount",
         "vip",
         "livestreamId",
@@ -255,7 +258,7 @@ class DocumentService {
 
   // ADMIN: Create document
   async createDocument(documentData) {
-    const { title, vip = false, livestreamId } = documentData;
+    const { title, vip = false, livestreamId, url, thumbnail } = documentData;
 
     if (livestreamId) {
       const livestream = await Livestream.findByPk(livestreamId);
@@ -269,6 +272,8 @@ class DocumentService {
       slug,
       vip,
       livestreamId,
+      url,
+      thumbnail,
     });
 
     return await this.getDocumentById(document.id);
@@ -279,14 +284,14 @@ class DocumentService {
     const document = await Document.findByPk(id);
     if (!document) throw new Error("Document not found");
 
-    const { title, vip, livestreamId } = documentData;
+    const { title, vip, livestreamId, url, thumbnail } = documentData;
 
     if (livestreamId && livestreamId !== document.livestreamId) {
       const livestream = await Livestream.findByPk(livestreamId);
       if (!livestream) throw new Error("Livestream not found");
     }
 
-    let updateData = { vip, livestreamId };
+    let updateData = { vip, livestreamId, url, thumbnail };
 
     if (title && title !== document.title) {
       updateData.title = title;
