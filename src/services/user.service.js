@@ -419,7 +419,8 @@ class UsersService {
       throw new Error("User not found");
     }
 
-    return await User.findByPk(id);
+    const updatedUser = await User.findByPk(id);
+    return updatedUser;
   }
 
   // ADMIN: Delete user

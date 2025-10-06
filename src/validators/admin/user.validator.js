@@ -135,6 +135,10 @@ exports.register = [
         errorMessage: "Link Facebook không hợp lệ.",
       },
     },
+    avatar: {
+      optional: { nullable: true, checkFalsy: true },
+      trim: true,
+    },
   }),
   handleValidationErrors,
 ];
@@ -223,17 +227,6 @@ exports.update = [
         },
         errorMessage:
           "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
-      },
-    },
-    roleName: {
-      optional: true,
-      notEmpty: {
-        errorMessage: "Vai trò không được để trống.",
-      },
-      isIn: {
-        options: [["admin", "teacher", "user"]],
-        errorMessage:
-          "Vai trò không hợp lệ. Chỉ được chọn: admin, teacher, user.",
       },
     },
     status: {
