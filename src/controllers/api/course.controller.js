@@ -1,7 +1,13 @@
 const courseService = require("@/services/course.service");
 
 exports.getAll = async (req, res) => {
-  const { limit = 10, page = 1, topic, sort = "newest" } = req.query;
+  const {
+    limit = 10,
+    page = 1,
+    topic,
+    sort = "newest",
+    search = "",
+  } = req.query;
   const pageNum = isNaN(+page) ? 1 : +page;
   const limitNum = isNaN(+limit) ? 10 : +limit;
   const data = await courseService.getAllCourses({
@@ -9,6 +15,7 @@ exports.getAll = async (req, res) => {
     offset: (pageNum - 1) * limitNum,
     topic,
     sort,
+    search,
   });
   res.success(200, data);
 };

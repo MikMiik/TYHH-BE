@@ -12,9 +12,11 @@ const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
 class CourseService {
   // API: Get all courses (public, filtered)
-  async getAllCourses({ limit, offset, topic, sort = "newest" }) {
+  async getAllCourses({ limit, offset, topic, sort = "newest", search }) {
     let whereClause = {};
-
+    if (search) {
+      whereClause[Op.or] = [{ title: { [Op.like]: `%${search}%` } }];
+    }
     // Topic filter for API
     if (topic) {
       const topicInstance = await Topic.findOne({ where: { slug: topic } });

@@ -7,6 +7,7 @@ exports.getAll = async (req, res) => {
     topic = "",
     vip = false,
     sort = "newest",
+    search = "",
   } = req.query;
 
   const pageNum = isNaN(+page) ? 1 : +page;
@@ -17,6 +18,7 @@ exports.getAll = async (req, res) => {
     vip,
     sort,
     topic,
+    search,
   });
   res.success(200, data);
 };

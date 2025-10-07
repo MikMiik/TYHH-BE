@@ -10,9 +10,18 @@ const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
 class DocumentService {
   // API: Get all documents (public, filtered)
-  async getAllDocuments({ limit, offset, vip, sort = "newest", topic }) {
+  async getAllDocuments({
+    limit,
+    offset,
+    vip,
+    sort = "newest",
+    topic,
+    search = "",
+  }) {
     let whereClause = { vip };
-
+    if (search) {
+      whereClause[Op.or] = [{ title: { [Op.like]: `%${search}%` } }];
+    }
     // Sort order
     let orderClause = [];
     switch (sort) {
