@@ -15,9 +15,19 @@ module.exports = (sequelize, DataTypes) => {
   }
   CourseOutline.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       title: { type: DataTypes.STRING(255), allowNull: false },
       slug: { type: DataTypes.STRING(255), allowNull: true, unique: true },
       order: { type: DataTypes.INTEGER },
+      status: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+        defaultValue: "draft",
+      },
       courseId: { type: DataTypes.INTEGER, allowNull: false },
       createdAt: {
         type: DataTypes.DATE,

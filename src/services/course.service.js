@@ -524,6 +524,118 @@ class CourseService {
       order: [["name", "ASC"]],
     });
   }
+
+  // API: Get courses created by teacher (teacherId)
+  async getCreatedCourses(teacherId, { limit = 10, offset = 0, search } = {}) {
+    let whereClause = { teacherId };
+
+    if (search) {
+      whereClause[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    const courses = await Course.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: Topic,
+          as: "topics",
+          attributes: ["id", "title", "slug"],
+          through: { attributes: [] },
+        },
+        {
+          model: CourseOutline,
+          as: "outlines",
+          attributes: ["id", "title", "slug"],
+          order: [["order", "ASC"]],
+        },
+        {
+          model: User,
+          as: "teacher",
+          attributes: ["id", "name", "username", "avatar"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+      limit,
+      offset,
+      distinct: true,
+    });
+
+    // Process course data to add counts
+    courses.rows = courses.rows.map((course) => {
+      const courseData = course.toJSON();
+
+      // Count outlines from included data
+      courseData.totalOutlines = courseData.outlines
+        ? courseData.outlines.length
+        : 0;
+
+      // Initialize other counts
+      courseData.totalLivestreams = 0;
+      courseData.studentCount = 0;
+
+      return courseData;
+    });
+
+    // Get livestream counts for each course
+    const courseIds = courses.rows.map((course) => course.id);
+    if (courseIds.length > 0) {
+      const livestreamCounts = await sequelize.query(
+        `
+        SELECT courseId, COUNT(*) as totalLivestreams 
+        FROM livestreams 
+        WHERE courseId IN (${courseIds.join(",")}) AND deletedAt IS NULL
+        GROUP BY courseId
+      `,
+        {
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      // Get student counts for each course
+      const studentCounts = await sequelize.query(
+        `
+        SELECT courseId, COUNT(*) as studentCount 
+        FROM course_user 
+        WHERE courseId IN (${courseIds.join(",")})
+        GROUP BY courseId
+      `,
+        {
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      // Merge counts into course data
+      courses.rows = courses.rows.map((course) => {
+        const livestreamCount = livestreamCounts.find(
+          (lc) => lc.courseId === course.id
+        );
+        course.totalLivestreams = livestreamCount
+          ? parseInt(livestreamCount.totalLivestreams)
+          : 0;
+
+        const studentCount = studentCounts.find(
+          (sc) => sc.courseId === course.id
+        );
+        course.studentCount = studentCount
+          ? parseInt(studentCount.studentCount)
+          : 0;
+
+        return course;
+      });
+    }
+
+    const totalPages = Math.ceil(courses.count / limit);
+
+    return {
+      courses: courses.rows,
+      totalPages,
+      totalCourses: courses.count,
+      currentPage: Math.floor(offset / limit) + 1,
+    };
+  }
 }
 
 module.exports = new CourseService();

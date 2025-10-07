@@ -44,6 +44,11 @@ module.exports = (sequelize, DataTypes) => {
       price: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
       discount: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
       isFree: { type: DataTypes.BOOLEAN, defaultValue: false },
+      status: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+        defaultValue: "draft",
+      },
       purpose: { type: DataTypes.STRING(255), allowNull: true },
       thumbnail: { type: DataTypes.STRING(191), allowNull: true },
       content: { type: DataTypes.TEXT, allowNull: true },

@@ -34,6 +34,11 @@ module.exports = (sequelize, DataTypes) => {
       courseOutlineId: { type: DataTypes.INTEGER, allowNull: false },
       url: { type: DataTypes.STRING(255), allowNull: true },
       view: { type: DataTypes.BIGINT, defaultValue: 0 },
+      status: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+        defaultValue: "draft",
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
