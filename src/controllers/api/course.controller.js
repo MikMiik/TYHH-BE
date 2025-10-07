@@ -40,3 +40,25 @@ exports.getCreatedCourses = async (req, res) => {
 
   res.success(200, data);
 };
+
+exports.createCourse = async (req, res) => {
+  try {
+    const teacherId = req.user.id; // Get teacher ID from authenticated user
+    const courseData = req.body;
+
+    // Validate required fields
+    if (!courseData.title) {
+      return res.error(400, "Title is required");
+    }
+
+    const newCourse = await courseService.createCourse(courseData, teacherId);
+    res.success(201, newCourse, "Course created successfully");
+  } catch (error) {
+    res.error(500, error.message);
+  }
+};
+
+exports.delete = async (req, res) => {
+  await courseService.deleteCourse(req.params.id);
+  res.success(200, null, "Course deleted successfully");
+};

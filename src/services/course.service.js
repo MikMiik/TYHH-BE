@@ -636,6 +636,59 @@ class CourseService {
       currentPage: Math.floor(offset / limit) + 1,
     };
   }
+
+  // Create a new course
+  async createCourse(courseData, teacherId) {
+    try {
+      // Generate unique slug if not provided
+      const slug =
+        courseData.slug || (await generateUniqueSlug(courseData.title, Course));
+
+      const newCourse = await Course.create({
+        title: courseData.title,
+        slug: slug,
+        description: courseData.description,
+        teacherId: teacherId,
+        price: courseData.price || 0,
+        discount: courseData.discount || 0,
+        isFree: courseData.isFree || false,
+        status: courseData.status || "draft",
+        purpose: courseData.purpose,
+        thumbnail: courseData.thumbnail,
+        content: courseData.content,
+        group: courseData.group,
+        introVideo: courseData.introVideo,
+      });
+
+      // If topics are provided, associate them with the course
+      if (courseData.topicIds && courseData.topicIds.length > 0) {
+        const courseTopics = courseData.topicIds.map((topicId) => ({
+          courseId: newCourse.id,
+          topicId: topicId,
+        }));
+        await CourseTopic.bulkCreate(courseTopics);
+      }
+
+      // Return the created course with associations
+      return await Course.findByPk(newCourse.id, {
+        include: [
+          {
+            model: User,
+            as: "teacher",
+            attributes: ["id", "name", "username"],
+          },
+          {
+            model: Topic,
+            as: "topics",
+            attributes: ["id", "title", "slug"],
+            through: { attributes: [] },
+          },
+        ],
+      });
+    } catch (error) {
+      throw new Error(`Error creating course: ${error.message}`);
+    }
+  }
 }
 
 module.exports = new CourseService();
