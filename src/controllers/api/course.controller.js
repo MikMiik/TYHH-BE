@@ -58,6 +58,12 @@ exports.createCourse = async (req, res) => {
   }
 };
 
+exports.update = async (req, res) => {
+  const courseData = req.body;
+  const course = await courseService.updateCourse(req.params.id, courseData);
+  res.success(200, course, "Course updated successfully");
+};
+
 exports.delete = async (req, res) => {
   await courseService.deleteCourse(req.params.id);
   res.success(200, null, "Course deleted successfully");

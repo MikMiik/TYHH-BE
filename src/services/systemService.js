@@ -1,5 +1,4 @@
 const { SiteInfo, City, School, Notification, Queue } = require("../models");
-const { Op } = require("sequelize");
 
 class SystemService {
   // Site Info methods

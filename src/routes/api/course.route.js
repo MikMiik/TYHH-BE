@@ -5,6 +5,7 @@ const courseController = require("@/controllers/api/course.controller");
 // Protected routes - require authentication (must be before dynamic routes)
 router.get("/teacher/created-courses", courseController.getCreatedCourses);
 router.post("/teacher/create", courseController.createCourse);
+router.put("/teacher/:id", courseController.update);
 router.delete("/teacher/:id", courseController.delete);
 
 // Public course routes - handled by auth middleware automatically

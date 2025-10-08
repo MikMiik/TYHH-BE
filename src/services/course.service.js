@@ -324,7 +324,6 @@ class CourseService {
     return await this.getCourseById(course.id);
   }
 
-  // ADMIN: Update course
   async updateCourse(id, courseData) {
     const course = await Course.findByPk(id);
     if (!course) throw new Error("Course not found");
@@ -341,11 +340,18 @@ class CourseService {
       content,
       thumbnail,
       introVideo,
+      topicIds,
     } = courseData;
 
     if (teacherId && teacherId !== course.teacherId) {
       const teacher = await User.findByPk(teacherId);
       if (!teacher) throw new Error("Teacher not found");
+    }
+
+    if (topicIds && topicIds.length > 0) {
+      await course.setTopics(topicIds);
+    } else if (topicIds && topicIds.length === 0) {
+      await course.setTopics([]);
     }
 
     let updateData = {
@@ -370,7 +376,6 @@ class CourseService {
     return await this.getCourseById(id);
   }
 
-  // ADMIN: Delete course
   async deleteCourse(id) {
     const course = await Course.findByPk(id);
     if (!course) throw new Error("Course not found");
