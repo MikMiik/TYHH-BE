@@ -6,6 +6,14 @@ exports.getOne = async (req, res) => {
   res.success(200, data);
 };
 
+exports.create = async (req, res) => {
+  const livestreamData = req.body;
+  const livestream = await livestreamService.createLivestreamAdmin(
+    livestreamData
+  );
+  res.success(201, livestream);
+};
+
 exports.trackView = async (req, res) => {
   const { isNewView } = req; // Set by trackLivestreamView middleware
 
