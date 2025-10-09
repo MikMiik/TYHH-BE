@@ -64,8 +64,22 @@ exports.create = [
     },
     url: {
       optional: true,
-      isURL: {
-        errorMessage: "URL must be a valid URL.",
+      custom: {
+        options: (value) => {
+          if (!value) return true;
+
+          // Allow relative paths (starts with /) or full URLs
+          if (
+            typeof value === "string" &&
+            (value.startsWith("/") || value.match(/^https?:\/\//))
+          ) {
+            return true;
+          }
+
+          throw new Error(
+            "URL must be a valid URL or relative path starting with '/'."
+          );
+        },
       },
     },
   }),
@@ -130,12 +144,6 @@ exports.update = [
           }
           return true;
         },
-      },
-    },
-    url: {
-      optional: true,
-      isURL: {
-        errorMessage: "URL must be a valid URL.",
       },
     },
   }),

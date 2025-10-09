@@ -11,6 +11,12 @@ router.post(
   livestreamController.create
 );
 
+router.put(
+  "/teacher/:id",
+  livestreamValidator.update,
+  livestreamController.update
+);
+
 // Public livestream routes - handled by auth middleware automatically
 router.get("/:slug", livestreamController.getOne);
 

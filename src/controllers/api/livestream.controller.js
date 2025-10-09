@@ -14,6 +14,16 @@ exports.create = async (req, res) => {
   res.success(201, livestream);
 };
 
+exports.update = async (req, res) => {
+  const { id } = req.params;
+  const livestreamData = req.body;
+  const livestream = await livestreamService.updateLivestreamAdmin(
+    id,
+    livestreamData
+  );
+  res.success(200, livestream);
+};
+
 exports.trackView = async (req, res) => {
   const { isNewView } = req; // Set by trackLivestreamView middleware
 
