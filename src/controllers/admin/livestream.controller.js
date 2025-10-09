@@ -33,7 +33,7 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   const livestreamData = req.body;
-  const livestream = await livestreamService.updateLivestreamAdmin(
+  const livestream = await livestreamService.updateLivestream(
     req.params.id,
     livestreamData
   );

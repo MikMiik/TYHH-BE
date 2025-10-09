@@ -17,6 +17,18 @@ router.put(
   livestreamController.update
 );
 
+router.delete(
+  "/teacher/:id",
+  livestreamValidator.delete,
+  livestreamController.delete
+);
+
+router.post(
+  "/teacher/reorder",
+  livestreamValidator.reorder,
+  livestreamController.reorder
+);
+
 // Public livestream routes - handled by auth middleware automatically
 router.get("/:slug", livestreamController.getOne);
 

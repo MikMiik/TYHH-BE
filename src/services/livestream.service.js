@@ -219,13 +219,13 @@ class LivestreamService {
   /**
    * Update livestream (admin only)
    */
-  async updateLivestreamAdmin(id, livestreamData) {
+  async updateLivestream(id, livestreamData) {
     const livestream = await Livestream.findByPk(id);
     if (!livestream) {
       throw new Error("Livestream not found");
     }
 
-    const { title, url, courseId, courseOutlineId } = livestreamData;
+    const { title, url, courseId, courseOutlineId, order } = livestreamData;
 
     // Validate course exists if changing
     if (courseId && courseId !== livestream.courseId) {
@@ -245,6 +245,11 @@ class LivestreamService {
 
     // Generate new slug if title changed
     let updateData = { url, courseId, courseOutlineId };
+
+    // Include order if provided
+    if (order !== undefined && order !== null) {
+      updateData.order = order;
+    }
 
     if (title && title !== livestream.title) {
       updateData.title = title;

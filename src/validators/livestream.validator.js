@@ -146,6 +146,95 @@ exports.update = [
         },
       },
     },
+    order: {
+      optional: true,
+      isInt: {
+        options: { min: 1 },
+        errorMessage: "Order must be a positive integer.",
+      },
+    },
+  }),
+  handleValidationErrors,
+];
+
+// Delete livestream validation (for ID parameter)
+exports.delete = [
+  checkSchema({
+    id: {
+      in: ["params"],
+      isInt: {
+        options: { min: 1 },
+        errorMessage: "Livestream ID must be a positive integer.",
+      },
+    },
+  }),
+  handleValidationErrors,
+];
+
+// Reorder livestreams validation
+exports.reorder = [
+  checkSchema({
+    courseOutlineId: {
+      notEmpty: {
+        errorMessage: "Course Outline ID is required.",
+      },
+      isInt: {
+        options: { min: 1 },
+        errorMessage: "Course Outline ID must be a positive integer.",
+      },
+      custom: {
+        options: async (value) => {
+          const courseOutline = await CourseOutline.findByPk(value);
+          if (!courseOutline) {
+            throw new Error("Course Outline not found.");
+          }
+          return true;
+        },
+      },
+    },
+    orders: {
+      isArray: {
+        errorMessage: "Orders must be an array.",
+      },
+      custom: {
+        options: (value) => {
+          if (!Array.isArray(value) || value.length === 0) {
+            throw new Error("Orders array cannot be empty.");
+          }
+
+          for (const item of value) {
+            if (!item.id || !Number.isInteger(item.id) || item.id <= 0) {
+              throw new Error(
+                "Each order item must have a valid positive integer ID."
+              );
+            }
+            if (
+              !item.order ||
+              !Number.isInteger(item.order) ||
+              item.order <= 0
+            ) {
+              throw new Error(
+                "Each order item must have a valid positive integer order."
+              );
+            }
+          }
+
+          // Check for duplicate IDs
+          const ids = value.map((item) => item.id);
+          if (new Set(ids).size !== ids.length) {
+            throw new Error("Duplicate livestream IDs are not allowed.");
+          }
+
+          // Check for duplicate orders
+          const orders = value.map((item) => item.order);
+          if (new Set(orders).size !== orders.length) {
+            throw new Error("Duplicate order values are not allowed.");
+          }
+
+          return true;
+        },
+      },
+    },
   }),
   handleValidationErrors,
 ];

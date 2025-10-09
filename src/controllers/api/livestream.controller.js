@@ -17,11 +17,23 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   const { id } = req.params;
   const livestreamData = req.body;
-  const livestream = await livestreamService.updateLivestreamAdmin(
+  const livestream = await livestreamService.updateLivestream(
     id,
     livestreamData
   );
   res.success(200, livestream);
+};
+
+exports.delete = async (req, res) => {
+  const { id } = req.params;
+  await livestreamService.deleteLivestreamAdmin(id);
+  res.success(200, { message: "Livestream deleted successfully" });
+};
+
+exports.reorder = async (req, res) => {
+  const { courseOutlineId, orders } = req.body;
+  await livestreamService.reorderLivestreams(courseOutlineId, orders);
+  res.success(200, { message: "Livestreams reordered successfully" });
 };
 
 exports.trackView = async (req, res) => {
