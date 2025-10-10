@@ -96,6 +96,11 @@ class CourseService {
       include: [
         { association: "teacher", attributes: ["id", "name", "facebook"] },
         {
+          association: "topics",
+          attributes: ["id", "title"],
+          through: { attributes: [] },
+        },
+        {
           association: "outlines",
           attributes: ["id", "title"],
           separate: true,
@@ -482,7 +487,6 @@ class CourseService {
     return true;
   }
 
-  // ADMIN: Update course teacher
   async updateCourseTeacher(courseId, teacherId) {
     const course = await Course.findByPk(courseId);
     if (!course) throw new Error("Course not found");
