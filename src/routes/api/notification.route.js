@@ -25,4 +25,14 @@ router.delete(
   notificationController.delete
 );
 
+// Mark notification as read
+router.post(
+  "/:id/mark-read",
+  notificationValidator.markAsRead,
+  notificationController.markAsRead
+);
+
+// Mark all notifications as read
+router.post("/mark-all-read", notificationController.markAllAsRead);
+
 module.exports = router;

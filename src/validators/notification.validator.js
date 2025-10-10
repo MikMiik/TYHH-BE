@@ -88,3 +88,20 @@ exports.delete = [
   }),
   handleValidationErrors,
 ];
+
+// Mark notification as read validation
+exports.markAsRead = [
+  checkSchema({
+    id: {
+      in: ["params"],
+      notEmpty: {
+        errorMessage: "Notification ID is required.",
+      },
+      isInt: {
+        options: { min: 1 },
+        errorMessage: "Notification ID must be a positive integer.",
+      },
+    },
+  }),
+  handleValidationErrors,
+];

@@ -8,6 +8,20 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "teacherId",
         as: "teacher",
       });
+
+      // Many-to-many relationship with users through UserNotification
+      Notification.belongsToMany(models.User, {
+        through: models.UserNotification,
+        foreignKey: "notificationId",
+        otherKey: "userId",
+        as: "readByUsers",
+      });
+
+      // Direct association with UserNotification for easier queries
+      Notification.hasMany(models.UserNotification, {
+        foreignKey: "notificationId",
+        as: "readRecords",
+      });
     }
   }
   Notification.init(
