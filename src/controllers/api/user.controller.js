@@ -13,6 +13,11 @@ exports.getUserByUsername = async (req, res) => {
   res.success(200, user);
 };
 
+exports.getAllStudents = async (req, res) => {
+  const users = await userService.getAllStudents();
+  res.success(200, users);
+};
+
 exports.updateProfile = async (req, res) => {
   const { confirmPassword, oldPassword, ...data } = req.body;
   const user = await userService.update(req.params.id, data);

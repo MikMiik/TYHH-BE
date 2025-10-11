@@ -20,6 +20,8 @@ router.get(
   userController.getMyCourses
 );
 
+router.get("/students", userController.getAllStudents);
+
 router.put(
   "/:id",
   requirePermission(PERMISSIONS.USER.PROFILE.UPDATE),

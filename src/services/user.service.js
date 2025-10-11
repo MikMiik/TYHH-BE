@@ -570,6 +570,30 @@ class UsersService {
       email: user.email,
     };
   }
+  async getAllStudents() {
+    return await User.findAll({
+      attributes: [
+        "id",
+        "name",
+        "username",
+        "avatar",
+        "point",
+        "yearOfBirth",
+        "city",
+        "school",
+      ],
+      include: [
+        {
+          model: Role,
+          as: "roles",
+          attributes: ["id", "name", "displayName"],
+          where: { name: "user" },
+          through: { attributes: [] },
+        },
+      ],
+      order: [["point", "DESC"]],
+    });
+  }
 }
 
 module.exports = new UsersService();
