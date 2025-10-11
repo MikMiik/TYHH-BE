@@ -1,6 +1,7 @@
 const { Notification, User, UserNotification } = require("@/models");
 const { Op } = require("sequelize");
 const getCurrentUserId = require("@/utils/getCurrentUserId");
+const pusher = require("@/configs/pusher");
 
 class NotificationService {
   // Get current user ID
@@ -91,7 +92,7 @@ class NotificationService {
           },
         ],
       });
-
+      await pusher.trigger(`notifications`, "new-notification", notification);
       return createdNotification;
     } catch (error) {
       console.error("Error creating notification:", error);
