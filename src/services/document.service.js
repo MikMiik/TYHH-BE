@@ -5,7 +5,7 @@ const {
   CourseOutline,
   sequelize,
 } = require("../models");
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
 class DocumentService {
@@ -277,9 +277,15 @@ class DocumentService {
     return document;
   }
 
-  // ADMIN: Create document
   async createDocument(documentData) {
-    const { title, vip = false, livestreamId, url, thumbnail } = documentData;
+    const {
+      title,
+      vip = false,
+      livestreamId,
+      url,
+      thumbnail,
+      slidenote,
+    } = documentData;
 
     if (livestreamId) {
       const livestream = await Livestream.findByPk(livestreamId);
@@ -295,6 +301,7 @@ class DocumentService {
       livestreamId,
       url,
       thumbnail,
+      slidenote,
     });
 
     return await this.getDocumentById(document.id);
@@ -323,7 +330,6 @@ class DocumentService {
     return await this.getDocumentById(id);
   }
 
-  // ADMIN: Delete document
   async deleteDocument(id) {
     const document = await Document.findByPk(id);
     if (!document) throw new Error("Document not found");

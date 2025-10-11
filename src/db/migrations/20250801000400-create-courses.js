@@ -31,10 +31,12 @@ module.exports = {
       price: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: true,
+        defaultValue: 0.0,
       },
       discount: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: true,
+        defaultValue: 0.0,
       },
       thumbnail: {
         type: Sequelize.STRING(255),
