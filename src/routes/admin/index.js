@@ -13,6 +13,7 @@ const documentRouter = require("./document.route");
 const dashboardRouter = require("./dashboard.route");
 const imagekitRouter = require("./imagekit.route");
 const systemRouter = require("./system.route");
+const scheduleRouter = require("./schedule.route");
 
 // Mount auth routes first (auth.route tự handle middleware cho từng endpoint)
 router.use("/auth", authRouter);
@@ -30,5 +31,6 @@ router.use("/documents", documentRouter);
 router.use("/dashboard", dashboardRouter);
 router.use("/imagekit", imagekitRouter);
 router.use("/system", systemRouter);
+router.use("/schedules", scheduleRouter);
 
 module.exports = router;
