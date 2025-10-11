@@ -5,7 +5,7 @@ const {
   CourseOutline,
   sequelize,
 } = require("../models");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
 class DocumentService {
@@ -80,16 +80,28 @@ class DocumentService {
   async getDocumentBySlug(slug) {
     return await Document.findOne({
       where: { slug },
-      attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+      attributes: {
+        exclude: ["updatedAt", "deletedAt"],
+        // Explicitly include all fields needed for DocumentDetail
+        include: ["slidenote", "url"],
+      },
       include: [
         {
           association: "livestream",
-          attributes: ["id", "title", "slug"],
+          attributes: ["id", "title", "slug", "view"],
           include: [
             {
               association: "course",
               attributes: ["id", "title", "slug"],
-              include: [{ association: "teacher", attributes: ["id", "name"] }],
+              include: [
+                { association: "teacher", attributes: ["id", "name"] },
+                { association: "topics", attributes: ["id", "title", "slug"] },
+              ],
+            },
+            {
+              association: "documents",
+              attributes: ["id", "title", "slug"],
+              where: { slug: { [Op.ne]: slug } },
             },
           ],
         },
