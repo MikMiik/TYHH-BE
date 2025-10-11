@@ -66,6 +66,7 @@ class CourseService {
         "teacherId",
         "thumbnail",
         "price",
+        "introVideo",
         "discount",
         "isFree",
         "createdAt",

@@ -7,15 +7,24 @@ exports.getAll = async (req, res) => {
     topic,
     sort = "newest",
     search = "",
+    isFree,
   } = req.query;
   const pageNum = isNaN(+page) ? 1 : +page;
   const limitNum = isNaN(+limit) ? 10 : +limit;
+
+  // Convert isFree string to boolean if provided
+  let isFreeBoolean;
+  if (isFree !== undefined) {
+    isFreeBoolean = isFree === "true";
+  }
+
   const data = await courseService.getAllCourses({
     limit: limitNum,
     offset: (pageNum - 1) * limitNum,
     topic,
     sort,
     search,
+    isFree: isFreeBoolean,
   });
   res.success(200, data);
 };
