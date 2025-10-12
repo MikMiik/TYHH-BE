@@ -15,6 +15,7 @@ const documentRouter = require("./document.route");
 const livestreamRouter = require("./livestream.route");
 const courseOutlineRouter = require("./courseOutline.route");
 const notificationRouter = require("./notification.route");
+const commentRouter = require("./comments.route");
 
 router.use("/auth", authRouter);
 router.use("/users", userRouter);
@@ -29,5 +30,6 @@ router.use("/documents", documentRouter);
 router.use("/livestreams", livestreamRouter);
 router.use("/course-outlines", courseOutlineRouter);
 router.use("/notifications", notificationRouter);
+router.use("/comments", commentRouter);
 
 module.exports = router;

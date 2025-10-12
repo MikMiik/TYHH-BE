@@ -1,15 +1,16 @@
-const { Livestream, Course, CourseOutline } = require("../models");
+const {
+  Livestream,
+  Course,
+  CourseOutline,
+  Comment,
+  User,
+} = require("../models");
 const { Op } = require("sequelize");
 const generateUniqueSlug = require("@/utils/generateUniqueSlug");
 
 class LivestreamService {
-  // ========== PUBLIC API METHODS ==========
-
-  /**
-   * Get livestream by slug for public API
-   */
   async getLivestreamBySlug(slug) {
-    return await Livestream.findOne({
+    const livestream = await Livestream.findOne({
       where: { slug },
       attributes: ["id", "title", "slug", "url", "view"],
       include: [
@@ -33,13 +34,49 @@ class LivestreamService {
             },
           ],
         },
-
         {
           association: "documents",
           attributes: ["id", "slug"],
         },
       ],
     });
+    const { rows: comments, count: commentsCount } =
+      await Comment.findAndCountAll({
+        where: {
+          commentableId: livestream.id,
+          commentableType: "livestream",
+        },
+        attributes: [
+          "id",
+          "parentId",
+          "content",
+          "isEdited",
+          "likesCount",
+          "createdAt",
+          "updatedAt",
+        ],
+        order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: User,
+            as: "commenter",
+            attributes: ["id", "username", "avatar", "name"],
+          },
+          {
+            model: Comment,
+            as: "parent",
+            attributes: ["id", "content"],
+            include: [
+              {
+                model: User,
+                as: "commenter",
+                attributes: ["id", "name", "username"],
+              },
+            ],
+          },
+        ],
+      });
+    return { livestream, comments, commentsCount };
   }
 
   // ========== ADMIN METHODS ==========
