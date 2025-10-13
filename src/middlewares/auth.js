@@ -180,19 +180,6 @@ function requireTeacher(req, res, next) {
   next();
 }
 
-// Require admin OR teacher role
-function requireAdminOrTeacher(req, res, next) {
-  if (!req.userId || !req.user) {
-    return res.error(401, "Authentication required");
-  }
-
-  if (!req.isAdmin && !req.isTeacher) {
-    return res.error(403, "Admin or Teacher access required");
-  }
-
-  next();
-}
-
 // Require specific permission(s)
 function requirePermission(permissions, options = {}) {
   return (req, res, next) => {
@@ -351,7 +338,6 @@ module.exports = {
   requireAuth,
   requireAdmin,
   requireTeacher,
-  requireAdminOrTeacher,
   requirePermission,
   requireRole,
   optionalPermission,

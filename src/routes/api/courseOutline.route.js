@@ -1,10 +1,12 @@
 const router = require("express").Router();
 const courseOutlineController = require("@/controllers/api/courseOutline.controller");
 const courseOutlineValidator = require("@/validators/courseOutline.validator");
+const { requireTeacher } = require("@/middlewares/auth");
 
 // Create new outline
 router.post(
   "/",
+  requireTeacher,
   courseOutlineValidator.create,
   courseOutlineController.createOutline
 );
@@ -18,16 +20,22 @@ router.get("/:id", courseOutlineController.getOutlineById);
 // Update outline
 router.put(
   "/:id",
+  requireTeacher,
   courseOutlineValidator.update,
   courseOutlineController.updateOutline
 );
 
 // Delete outline
-router.delete("/:id", courseOutlineController.deleteOutline);
+router.delete(
+  "/:id",
+  requireAdminOrTeacher,
+  courseOutlineController.deleteOutline
+);
 
 // Reorder outlines
 router.patch(
   "/course/:courseId/reorder",
+  requireTeacher,
   courseOutlineValidator.reorder,
   courseOutlineController.reorderOutlines
 );
