@@ -54,6 +54,9 @@ async function loadUserData(req) {
     // Check if user is admin
     req.isAdmin = checkIsAdmin(req.user);
 
+    // Check if user is teacher
+    req.isTeacher = checkIsTeacher(req.user);
+
     if (req.isAdmin) {
       // Admin gets all permissions
       req.userRoles = ["admin"];
@@ -99,6 +102,7 @@ async function loadUserData(req) {
     req.userRoles = [];
     req.userPermissions = [];
     req.isAdmin = false;
+    req.isTeacher = false;
   }
 }
 
@@ -126,6 +130,22 @@ function checkIsAdmin(user) {
   return false;
 }
 
+// Check if user is teacher (centralized logic)
+function checkIsTeacher(user) {
+  if (!user) return false;
+
+  // Method 1: Check roles array for teacher role
+  if (user.roles && Array.isArray(user.roles)) {
+    const hasTeacherRole = user.roles.some((role) => role.name === "teacher");
+    if (hasTeacherRole) return true;
+  }
+
+  // Method 2: Check legacy role field (fallback)
+  if (user.role === "teacher") return true;
+
+  return false;
+}
+
 // Require authentication
 function requireAuth(req, res, next) {
   if (!req.userId || !req.user) {
@@ -142,6 +162,32 @@ function requireAdmin(req, res, next) {
 
   if (!req.isAdmin) {
     return res.error(403, "Admin access required");
+  }
+
+  next();
+}
+
+// Require teacher role
+function requireTeacher(req, res, next) {
+  if (!req.userId || !req.user) {
+    return res.error(401, "Authentication required");
+  }
+
+  if (!req.isTeacher) {
+    return res.error(403, "Teacher access required");
+  }
+
+  next();
+}
+
+// Require admin OR teacher role
+function requireAdminOrTeacher(req, res, next) {
+  if (!req.userId || !req.user) {
+    return res.error(401, "Authentication required");
+  }
+
+  if (!req.isAdmin && !req.isTeacher) {
+    return res.error(403, "Admin or Teacher access required");
   }
 
   next();
@@ -304,10 +350,13 @@ module.exports = {
   auth,
   requireAuth,
   requireAdmin,
+  requireTeacher,
+  requireAdminOrTeacher,
   requirePermission,
   requireRole,
   optionalPermission,
   getUserPermissions,
   userHasPermission,
   checkIsAdmin,
+  checkIsTeacher,
 };

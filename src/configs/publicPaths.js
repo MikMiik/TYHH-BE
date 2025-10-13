@@ -32,6 +32,7 @@ const publicPaths = [
   { path: "/imagekit/auth", method: "get", exact: true },
   { path: "/siteinfo", method: "get" },
   { path: "/socials", method: "get" },
+  { path: "/students", method: "get", exact: true },
 ];
 
 function isPublicRoute(path, method) {

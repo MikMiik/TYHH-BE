@@ -15,7 +15,7 @@ const imagekitRouter = require("./imagekit.route");
 const systemRouter = require("./system.route");
 const scheduleRouter = require("./schedule.route");
 
-// Mount auth routes first (auth.route tự handle middleware cho từng endpoint)
+// Mount auth routes first (auth.route tự handle middleware cho từn5g endpoint)
 router.use("/auth", authRouter);
 
 // Apply auth + requireAdmin middleware for all other routes
