@@ -26,11 +26,7 @@ router.put(
 );
 
 // Delete outline
-router.delete(
-  "/:id",
-  requireAdminOrTeacher,
-  courseOutlineController.deleteOutline
-);
+router.delete("/:id", requireTeacher, courseOutlineController.deleteOutline);
 
 // Reorder outlines
 router.patch(

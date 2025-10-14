@@ -1,11 +1,11 @@
 const express = require("express");
 const scheduleController = require("@/controllers/admin/schedule.controller");
 const router = express.Router();
-const { requireAdminOrTeacher } = require("@/middlewares/auth");
+const { requireTeacher } = require("@/middlewares/auth");
 
 router.get("/", scheduleController.getAll);
-router.post("/", requireAdminOrTeacher, scheduleController.create);
-router.put("/:id", requireAdminOrTeacher, scheduleController.update);
-router.delete("/:id", requireAdminOrTeacher, scheduleController.delete);
+router.post("/", requireTeacher, scheduleController.create);
+router.put("/:id", requireTeacher, scheduleController.update);
+router.delete("/:id", requireTeacher, scheduleController.delete);
 
 module.exports = router;
