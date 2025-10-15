@@ -11,4 +11,7 @@ router.post("/mock", paymentController.createMockPayment);
 router.get("/mock/receipt/:paymentId", paymentController.getMockReceipt);
 router.get("/history", paymentController.getUserPayments);
 
+// Check enrollment status for a course
+router.get("/enrollment/:courseId", paymentController.checkEnrollment);
+
 module.exports = router;
