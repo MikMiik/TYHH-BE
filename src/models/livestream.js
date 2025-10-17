@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "livestreamId",
         as: "documents",
       });
+      Livestream.hasMany(models.UserLivestream, {
+        foreignKey: "livestreamId",
+        as: "userLivestreams",
+      });
     }
   }
   Livestream.init(

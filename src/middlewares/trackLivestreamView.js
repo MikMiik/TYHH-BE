@@ -1,4 +1,4 @@
-const { Livestream } = require("@/models");
+const { Livestream, UserLivestream } = require("@/models");
 
 const trackLivestreamView = async (req, res, next) => {
   try {
@@ -41,7 +41,40 @@ const trackLivestreamView = async (req, res, next) => {
       `📊 New livestream view tracked: User/Session ${sessionId} viewed livestream ${livestreamId}`
     );
 
-    // Đơn giản: tăng view trực tiếp trong database
+    // Track user-livestream relationship if userId exists
+    if (userId) {
+      try {
+        // Check if user has already viewed this livestream
+        const existingView = await UserLivestream.findOne({
+          where: {
+            userId: userId,
+            livestreamId: livestreamId,
+          },
+        });
+
+        // Only create record if user hasn't viewed this livestream before
+        if (!existingView) {
+          await UserLivestream.create({
+            userId: userId,
+            livestreamId: livestreamId,
+          });
+          console.log(
+            `📝 First-time view recorded for user ${userId} on livestream ${livestreamId}`
+          );
+        } else {
+          console.log(
+            `🔄 Return view for user ${userId} on livestream ${livestreamId} (not recorded)`
+          );
+        }
+      } catch (error) {
+        console.error(
+          "❌ Error tracking user-livestream relationship:",
+          error.message
+        );
+      }
+    }
+
+    // Đơn giản: tăng view trực tiếp trong database (always increment regardless)
     try {
       await Livestream.increment("view", {
         where: { id: livestreamId },

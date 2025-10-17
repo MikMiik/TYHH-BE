@@ -2,7 +2,16 @@
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class UserLivestream extends Model {
-    static associate(models) {}
+    static associate(models) {
+      UserLivestream.belongsTo(models.User, {
+        foreignKey: "userId",
+        as: "user",
+      });
+      UserLivestream.belongsTo(models.Livestream, {
+        foreignKey: "livestreamId",
+        as: "livestream",
+      });
+    }
   }
   UserLivestream.init(
     {
