@@ -4,7 +4,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const port = 3000;
+const port = 3002;
 const { sequelize } = require("@/models");
 
 // Redis Import
@@ -35,12 +35,7 @@ const { setContext } = require("@/middlewares/setContext");
 // Middleware
 app.use(
   cors({
-    origin: [
-      process.env.CLIENT_URL,
-      "http://localhost:5173",
-      "http://localhost:3001",
-      "http://localhost:3002",
-    ],
+    origin: [process.env.CLIENT_URL, "http://localhost:5173"],
     allowedHeaders: [
       "Origin",
       "X-Requested-With",
