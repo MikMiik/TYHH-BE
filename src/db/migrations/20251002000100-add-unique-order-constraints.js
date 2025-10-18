@@ -32,25 +32,6 @@ module.exports = {
       ) AND l1.\`order\` IS NOT NULL
     `);
 
-    // Remove existing indexes if they exist
-    try {
-      await queryInterface.removeIndex(
-        "course-outline",
-        "unique_order_per_course"
-      );
-    } catch (error) {
-      // Index doesn't exist, ignore error
-    }
-
-    try {
-      await queryInterface.removeIndex(
-        "livestreams",
-        "unique_order_per_outline"
-      );
-    } catch (error) {
-      // Index doesn't exist, ignore error
-    }
-
     // Add unique constraint for (order, courseId) in course-outline table
     await queryInterface.addIndex("course-outline", {
       fields: ["order", "courseId"],
@@ -77,11 +58,38 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // Remove unique constraints
-    await queryInterface.removeIndex(
-      "course-outline",
-      "unique_order_per_course"
-    );
-    await queryInterface.removeIndex("livestreams", "unique_order_per_outline");
+    // Remove unique constraints if they exist (defensive: avoid errors when index missing)
+    try {
+      const courseOutlineIndexes = await queryInterface.showIndex(
+        "course-outline"
+      );
+      const hasCourseIndex = courseOutlineIndexes.some(
+        (i) => i && i.name === "unique_order_per_course"
+      );
+      if (hasCourseIndex) {
+        await queryInterface.removeIndex(
+          "course-outline",
+          "unique_order_per_course"
+        );
+      }
+    } catch (err) {
+      // swallow/show error for debugging but don't fail migration down
+      // console.warn('Could not check/remove index unique_order_per_course:', err.message || err);
+    }
+
+    try {
+      const livestreamIndexes = await queryInterface.showIndex("livestreams");
+      const hasLivestreamIndex = livestreamIndexes.some(
+        (i) => i && i.name === "unique_order_per_outline"
+      );
+      if (hasLivestreamIndex) {
+        await queryInterface.removeIndex(
+          "livestreams",
+          "unique_order_per_outline"
+        );
+      }
+    } catch (err) {
+      // console.warn('Could not check/remove index unique_order_per_outline:', err.message || err);
+    }
   },
 };
