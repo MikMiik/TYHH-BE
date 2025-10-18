@@ -28,7 +28,6 @@ module.exports = {
         allowNull: true,
       },
     });
-    await queryInterface.addIndex("topics", ["title"]);
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable("topics");
