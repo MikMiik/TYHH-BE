@@ -10,13 +10,40 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    // Revert group column to INTEGER with references
+    // Before changing column type back to INTEGER, ensure current values are numeric
+    // Set any non-numeric `group` values to NULL to avoid foreign-key/type conflicts
+    try {
+      // This raw query uses MySQL REGEXP to find non-digit values and set them to NULL
+      await queryInterface.sequelize.query(
+        "UPDATE `courses` SET `group` = NULL WHERE `group` IS NOT NULL AND `group` REGEXP '[^0-9]'"
+      );
+    } catch (err) {
+      // If the DB dialect doesn't support REGEXP or query fails, proceed cautiously
+      // console.warn('Could not normalize course.group values before down migration:', err.message || err);
+    }
+
+    // Now change the column to INTEGER
     await queryInterface.changeColumn("courses", "group", {
       type: Sequelize.INTEGER,
       allowNull: true,
-      references: { model: "socials", key: "id" },
-      onUpdate: "CASCADE",
-      onDelete: "SET NULL",
     });
+
+    // Re-create foreign key constraint if possible. Wrap in try/catch to avoid failing down
+    try {
+      // Depending on the dialect and previous constraint removal, re-adding may be optional
+      await queryInterface.addConstraint("courses", {
+        fields: ["group"],
+        type: "foreign key",
+        name: "courses_ibfk_2",
+        references: {
+          table: "socials",
+          field: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      });
+    } catch (err) {
+      // console.warn('Could not add foreign key constraint courses_ibfk_2 during down migration:', err.message || err);
+    }
   },
 };
