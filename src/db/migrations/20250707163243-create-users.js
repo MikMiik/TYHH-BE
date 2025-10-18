@@ -104,7 +104,6 @@ module.exports = {
     await queryInterface.addIndex("users", ["email"]);
     await queryInterface.addIndex("users", ["username"]);
     await queryInterface.addIndex("users", ["phone"]);
-    await queryInterface.addIndex("users", ["facebook"]);
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable("users");
