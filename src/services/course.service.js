@@ -662,7 +662,6 @@ class CourseService {
         price: courseData.price || 0,
         discount: courseData.discount || 0,
         isFree: courseData.isFree || false,
-        status: courseData.status || "draft",
         purpose: courseData.purpose,
         thumbnail: courseData.thumbnail,
         content: courseData.content,
