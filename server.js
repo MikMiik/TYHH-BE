@@ -35,7 +35,11 @@ const { setContext } = require("@/middlewares/setContext");
 // Middleware
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL, "http://localhost:5173"],
+    origin: [
+      process.env.CLIENT_URL,
+      process.env.ADMIN_URL,
+      "http://localhost:5173",
+    ],
     allowedHeaders: [
       "Origin",
       "X-Requested-With",
