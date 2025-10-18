@@ -14,6 +14,7 @@ const dashboardRouter = require("./dashboard.route");
 const imagekitRouter = require("./imagekit.route");
 const systemRouter = require("./system.route");
 const scheduleRouter = require("./schedule.route");
+const uploadRouter = require("./upload.route");
 
 // Mount auth routes first (auth.route tự handle middleware cho từn5g endpoint)
 router.use("/auth", authRouter);
@@ -32,5 +33,6 @@ router.use("/dashboard", dashboardRouter);
 router.use("/imagekit", imagekitRouter);
 router.use("/system", systemRouter);
 router.use("/schedules", scheduleRouter);
+router.use("/upload", uploadRouter);
 
 module.exports = router;
