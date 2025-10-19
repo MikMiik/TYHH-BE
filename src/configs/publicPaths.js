@@ -28,7 +28,7 @@ const publicPaths = [
   { path: "/documents", method: "get" },
   { path: "/documents/:slug", method: "get", pattern: true },
   { path: "/livestreams", method: "get" },
-  { path: "/livestreams/:slug", method: "get", pattern: true },
+  // Note: /livestreams/:slug now requires authentication and course enrollment
   { path: "/imagekit/auth", method: "get", exact: true },
   { path: "/siteinfo", method: "get" },
   { path: "/socials", method: "get" },

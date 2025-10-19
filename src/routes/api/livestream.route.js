@@ -3,6 +3,7 @@ const router = express.Router();
 const livestreamController = require("@/controllers/api/livestream.controller");
 const livestreamValidator = require("@/validators/livestream.validator");
 const trackLivestreamView = require("@/middlewares/trackLivestreamView");
+const checkCourseAccess = require("@/middlewares/checkCourseAccess");
 const { requireTeacher } = require("@/middlewares/auth");
 
 // Protected routes - require authentication (must be before dynamic routes)
@@ -34,10 +35,10 @@ router.post(
   livestreamController.reorder
 );
 
-// Public livestream routes - handled by auth middleware automatically
-router.get("/:slug", livestreamController.getOne);
+// Protected livestream routes - requires authentication and enrollment
+router.get("/:slug", checkCourseAccess, livestreamController.getOne);
 
-// Track view khi user click play video
-router.post("/:slug/view", trackLivestreamView, livestreamController.trackView);
+// Track view khi user click play video - also requires enrollment
+router.post("/:slug/view", checkCourseAccess, trackLivestreamView, livestreamController.trackView);
 
 module.exports = router;
