@@ -1,38 +1,69 @@
 const systemService = require("@/services/systemService");
 
-// Site Info Controllers
-exports.getSiteInfo = async (req, res) => {
+// Socials Controllers
+exports.getSocials = async (req, res) => {
   try {
-    const siteInfo = await systemService.getSiteInfo();
-    res.success(200, siteInfo);
+    const socials = await systemService.getSocials();
+    res.success(200, socials);
   } catch (error) {
-    console.error("Get site info error:", error);
-    res.error(500, "Failed to get site info", error.message);
+    console.error("Get socials error:", error);
+    res.error(500, "Failed to get socials", error.message);
   }
 };
 
-exports.updateSiteInfo = async (req, res) => {
+exports.addSocial = async (req, res) => {
   try {
-    const { siteName, companyName, email, taxCode, phone, address } = req.body;
+    const { platform, url } = req.body;
 
-    // Basic validation
-    if (!siteName || !companyName) {
-      return res.error(400, "Site name and company name are required");
+    if (!platform || !platform.trim()) {
+      return res.error(400, "Platform is required");
+    }
+    if (!url || !url.trim()) {
+      return res.error(400, "URL is required");
     }
 
-    const siteInfo = await systemService.updateSiteInfo({
-      siteName,
-      companyName,
-      email,
-      taxCode,
-      phone,
-      address,
+    const social = await systemService.addSocial({
+      platform: platform.trim(),
+      url: url.trim(),
     });
-
-    res.success(200, siteInfo);
+    res.success(201, social);
   } catch (error) {
-    console.error("Update site info error:", error);
-    res.error(500, "Failed to update site info", error.message);
+    console.error("Add social error:", error);
+    res.error(500, "Failed to add social", error.message);
+  }
+};
+
+exports.updateSocial = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { platform, url } = req.body;
+
+    if (!platform || !platform.trim()) {
+      return res.error(400, "Platform is required");
+    }
+    if (!url || !url.trim()) {
+      return res.error(400, "URL is required");
+    }
+
+    const social = await systemService.updateSocial(id, {
+      platform: platform.trim(),
+      url: url.trim(),
+    });
+    res.success(200, social);
+  } catch (error) {
+    console.error("Update social error:", error);
+    res.error(500, "Failed to update social", error.message);
+  }
+};
+
+exports.deleteSocial = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await systemService.deleteSocial(id);
+    res.success(200, result);
+  } catch (error) {
+    console.error("Delete social error:", error);
+    res.error(500, "Failed to delete social", error.message);
   }
 };
 
@@ -91,66 +122,64 @@ exports.deleteCity = async (req, res) => {
   }
 };
 
-// Schools Controllers
-exports.getSchools = async (req, res) => {
+// Topics Controllers
+exports.getTopics = async (req, res) => {
   try {
-    const schools = await systemService.getSchools();
-    res.success(200, schools);
+    const topics = await systemService.getTopics();
+    res.success(200, topics);
   } catch (error) {
-    console.error("Get schools error:", error);
-    res.error(500, "Failed to get schools", error.message);
+    console.error("Get topics error:", error);
+    res.error(500, "Failed to get topics", error.message);
   }
 };
 
-exports.addSchool = async (req, res) => {
+exports.addTopic = async (req, res) => {
   try {
-    const { name, cityId } = req.body;
+    const { title } = req.body;
 
-    if (!name || !name.trim()) {
-      return res.error(400, "School name is required");
+    if (!title || !title.trim()) {
+      return res.error(400, "Topic title is required");
     }
 
-    const school = await systemService.addSchool({
-      name: name.trim(),
-      cityId: cityId || null,
+    const topic = await systemService.addTopic({
+      title: title.trim(),
     });
 
-    res.success(201, school);
+    res.success(201, topic);
   } catch (error) {
-    console.error("Add school error:", error);
-    res.error(500, "Failed to add school", error.message);
+    console.error("Add topic error:", error);
+    res.error(500, "Failed to add topic", error.message);
   }
 };
 
-exports.updateSchool = async (req, res) => {
+exports.updateTopic = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, cityId } = req.body;
+    const { title } = req.body;
 
-    if (!name || !name.trim()) {
-      return res.error(400, "School name is required");
+    if (!title || !title.trim()) {
+      return res.error(400, "Topic title is required");
     }
 
-    const school = await systemService.updateSchool(id, {
-      name: name.trim(),
-      cityId: cityId || null,
+    const topic = await systemService.updateTopic(id, {
+      title: title.trim(),
     });
 
-    res.success(200, school);
+    res.success(200, topic);
   } catch (error) {
-    console.error("Update school error:", error);
-    res.error(500, "Failed to update school", error.message);
+    console.error("Update topic error:", error);
+    res.error(500, "Failed to update topic", error.message);
   }
 };
 
-exports.deleteSchool = async (req, res) => {
+exports.deleteTopic = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await systemService.deleteSchool(id);
+    const result = await systemService.deleteTopic(id);
     res.success(200, result);
   } catch (error) {
-    console.error("Delete school error:", error);
-    res.error(500, "Failed to delete school", error.message);
+    console.error("Delete topic error:", error);
+    res.error(500, "Failed to delete topic", error.message);
   }
 };
 
@@ -172,7 +201,7 @@ exports.getNotifications = async (req, res) => {
 
 exports.addNotification = async (req, res) => {
   try {
-    const { title, content, type } = req.body;
+    const { title, message } = req.body;
 
     if (!title || !title.trim()) {
       return res.error(400, "Notification title is required");
@@ -180,8 +209,7 @@ exports.addNotification = async (req, res) => {
 
     const notification = await systemService.addNotification({
       title: title.trim(),
-      content: content || "",
-      type: type || "general",
+      message: message || "",
     });
 
     res.success(201, notification);

@@ -1,79 +1,65 @@
-const { SiteInfo, City, School, Notification, Queue } = require("../models");
+const { City, Social, Topic, Notification, Queue, User } = require("../models");
+const { createTopic } = require("./topic.service");
 
 class SystemService {
-  // Site Info methods
-  async getSiteInfo() {
+  // Socials methods
+  async getSocials() {
     try {
-      // Get the first (and should be only) site info record
-      const siteInfo = await SiteInfo.findOne({
-        attributes: [
-          "id",
-          "siteName",
-          "companyName",
-          "email",
-          "taxCode",
-          "phone",
-          "address",
-          "createdAt",
-          "updatedAt",
-        ],
+      const socials = await Social.findAll({
+        attributes: ["id", "platform", "url", "createdAt", "updatedAt"],
+        order: [["platform", "ASC"]],
       });
-
-      // If no site info exists, return default structure
-      if (!siteInfo) {
-        return {
-          id: null,
-          siteName: "",
-          companyName: "",
-          email: "",
-          taxCode: "",
-          phone: "",
-          address: "",
-          createdAt: null,
-          updatedAt: null,
-        };
-      }
-
-      return siteInfo;
+      return socials;
     } catch (error) {
-      console.error("Error getting site info:", error);
-      throw new Error("Failed to get site info");
+      console.error("Error getting socials:", error);
+      throw new Error("Failed to get socials");
     }
   }
 
-  async updateSiteInfo(data) {
+  async addSocial(data) {
     try {
-      const { siteName, companyName, email, taxCode, phone, address } = data;
+      const { platform, url } = data;
+      const social = await Social.create({ platform, url });
+      return social;
+    } catch (error) {
+      console.error("Error adding social:", error);
+      if (error.name === "SequelizeUniqueConstraintError") {
+        throw new Error("Social platform already exists");
+      }
+      throw new Error("Failed to add social");
+    }
+  }
 
-      // Check if site info exists
-      let siteInfo = await SiteInfo.findOne();
-
-      if (siteInfo) {
-        // Update existing record
-        await siteInfo.update({
-          siteName,
-          companyName,
-          email,
-          taxCode,
-          phone,
-          address,
-        });
-      } else {
-        // Create new record
-        siteInfo = await SiteInfo.create({
-          siteName,
-          companyName,
-          email,
-          taxCode,
-          phone,
-          address,
-        });
+  async updateSocial(id, data) {
+    try {
+      const social = await Social.findByPk(id);
+      if (!social) {
+        throw new Error("Social not found");
       }
 
-      return siteInfo;
+      await social.update(data);
+      return social;
     } catch (error) {
-      console.error("Error updating site info:", error);
-      throw new Error("Failed to update site info");
+      console.error("Error updating social:", error);
+      if (error.name === "SequelizeUniqueConstraintError") {
+        throw new Error("Social platform already exists");
+      }
+      throw new Error("Failed to update social");
+    }
+  }
+
+  async deleteSocial(id) {
+    try {
+      const social = await Social.findByPk(id);
+      if (!social) {
+        throw new Error("Social not found");
+      }
+
+      await social.destroy();
+      return { message: "Social deleted successfully" };
+    } catch (error) {
+      console.error("Error deleting social:", error);
+      throw new Error("Failed to delete social");
     }
   }
 
@@ -137,72 +123,55 @@ class SystemService {
     }
   }
 
-  // Schools methods
-  async getSchools() {
+  // Topics methods
+  async getTopics() {
     try {
-      const schools = await School.findAll({
-        attributes: ["id", "name", "cityId", "createdAt", "updatedAt"],
-        include: [
-          {
-            model: City,
-            as: "city", // Make sure this alias matches your model association
-            attributes: ["id", "name"],
-            required: false,
-          },
-        ],
-        order: [["name", "ASC"]],
+      const topics = await Topic.findAll({
+        attributes: ["id", "title", "slug", "createdAt", "updatedAt"],
+        order: [["title", "ASC"]],
       });
-      return schools;
+      return topics;
     } catch (error) {
-      console.error("Error getting schools:", error);
-      throw new Error("Failed to get schools");
+      console.error("Error getting topics:", error);
+      throw new Error("Failed to get topics");
     }
   }
 
-  async addSchool(data) {
+  async addTopic(data) {
+    const topic = await createTopic(data);
+    return topic;
+  }
+
+  async updateTopic(id, data) {
     try {
-      const { name, cityId } = data;
-      const school = await School.create({ name, cityId });
-      return school;
+      const topic = await Topic.findByPk(id);
+      if (!topic) {
+        throw new Error("Topic not found");
+      }
+
+      await topic.update(data);
+      return topic;
     } catch (error) {
-      console.error("Error adding school:", error);
+      console.error("Error updating topic:", error);
       if (error.name === "SequelizeUniqueConstraintError") {
-        throw new Error("School name already exists");
+        throw new Error("Topic title already exists");
       }
-      throw new Error("Failed to add school");
+      throw new Error("Failed to update topic");
     }
   }
 
-  async updateSchool(id, data) {
+  async deleteTopic(id) {
     try {
-      const school = await School.findByPk(id);
-      if (!school) {
-        throw new Error("School not found");
+      const topic = await Topic.findByPk(id);
+      if (!topic) {
+        throw new Error("Topic not found");
       }
 
-      await school.update(data);
-      return school;
+      await topic.destroy();
+      return { message: "Topic deleted successfully" };
     } catch (error) {
-      console.error("Error updating school:", error);
-      if (error.name === "SequelizeUniqueConstraintError") {
-        throw new Error("School name already exists");
-      }
-      throw new Error("Failed to update school");
-    }
-  }
-
-  async deleteSchool(id) {
-    try {
-      const school = await School.findByPk(id);
-      if (!school) {
-        throw new Error("School not found");
-      }
-
-      await school.destroy();
-      return { message: "School deleted successfully" };
-    } catch (error) {
-      console.error("Error deleting school:", error);
-      throw new Error("Failed to delete school");
+      console.error("Error deleting topic:", error);
+      throw new Error("Failed to delete topic");
     }
   }
 
@@ -222,10 +191,17 @@ class SystemService {
         attributes: [
           "id",
           "title",
-          "content",
-          "type",
+          "message",
+          "teacherId",
           "createdAt",
           "updatedAt",
+        ],
+        include: [
+          {
+            model: User,
+            as: "teacher",
+            attributes: ["id", "name"],
+          },
         ],
         order: [["createdAt", "DESC"]],
         limit: parseInt(limit),
@@ -249,11 +225,10 @@ class SystemService {
 
   async addNotification(data) {
     try {
-      const { title, content, type } = data;
+      const { title, message } = data;
       const notification = await Notification.create({
         title,
-        content,
-        type,
+        message,
       });
       return notification;
     } catch (error) {

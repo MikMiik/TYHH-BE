@@ -2,9 +2,11 @@ const express = require("express");
 const systemController = require("@/controllers/admin/systemController");
 const router = express.Router();
 
-// Site Info routes
-router.get("/site-info", systemController.getSiteInfo);
-router.put("/site-info", systemController.updateSiteInfo);
+// Socials routes
+router.get("/socials", systemController.getSocials);
+router.post("/socials", systemController.addSocial);
+router.put("/socials/:id", systemController.updateSocial);
+router.delete("/socials/:id", systemController.deleteSocial);
 
 // Cities routes
 router.get("/cities", systemController.getCities);
@@ -12,11 +14,11 @@ router.post("/cities", systemController.addCity);
 router.put("/cities/:id", systemController.updateCity);
 router.delete("/cities/:id", systemController.deleteCity);
 
-// Schools routes
-router.get("/schools", systemController.getSchools);
-router.post("/schools", systemController.addSchool);
-router.put("/schools/:id", systemController.updateSchool);
-router.delete("/schools/:id", systemController.deleteSchool);
+// Topics routes
+router.get("/topics", systemController.getTopics);
+router.post("/topics", systemController.addTopic);
+router.put("/topics/:id", systemController.updateTopic);
+router.delete("/topics/:id", systemController.deleteTopic);
 
 // Notifications routes
 router.get("/notifications", systemController.getNotifications);
