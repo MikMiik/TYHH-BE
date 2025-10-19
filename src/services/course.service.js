@@ -266,7 +266,7 @@ class CourseService {
         {
           model: CourseOutline,
           as: "outlines",
-          attributes: ["id", "title", "slug"],
+          attributes: ["id", "title", "slug", "order"],
         },
         {
           model: Topic,
