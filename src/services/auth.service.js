@@ -78,7 +78,7 @@ const login = async (data) => {
     await userService.update(user.id, { lastLogin: new Date() });
     return result;
   } catch (err) {
-    throw new Error("Failed to generate authentication tokens.");
+    throw new Error("Login fail");
   }
 };
 
