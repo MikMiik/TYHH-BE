@@ -1,7 +1,22 @@
-const { City, Social, Topic, Notification, Queue, User } = require("../models");
+const { City, Social, Topic, Notification, Queue, User, Role } = require("../models");
 const { createTopic } = require("./topic.service");
 
 class SystemService {
+  // Roles methods
+  async getRoles() {
+    try {
+      const roles = await Role.findAll({
+        where: { isActive: true },
+        attributes: ["id", "name", "displayName", "isActive", "createdAt", "updatedAt"],
+        order: [["name", "ASC"]],
+      });
+      return roles;
+    } catch (error) {
+      console.error("Error getting roles:", error);
+      throw new Error("Failed to get roles");
+    }
+  }
+
   // Socials methods
   async getSocials() {
     try {

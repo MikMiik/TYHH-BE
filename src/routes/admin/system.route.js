@@ -2,6 +2,9 @@ const express = require("express");
 const systemController = require("@/controllers/admin/systemController");
 const router = express.Router();
 
+// Roles routes
+router.get("/roles", systemController.getRoles);
+
 // Socials routes
 router.get("/socials", systemController.getSocials);
 router.post("/socials", systemController.addSocial);

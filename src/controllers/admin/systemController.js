@@ -1,5 +1,16 @@
 const systemService = require("@/services/systemService");
 
+// Roles Controllers
+exports.getRoles = async (req, res) => {
+  try {
+    const roles = await systemService.getRoles();
+    res.success(200, roles);
+  } catch (error) {
+    console.error("Get roles error:", error);
+    res.error(500, "Failed to get roles", error.message);
+  }
+};
+
 // Socials Controllers
 exports.getSocials = async (req, res) => {
   try {

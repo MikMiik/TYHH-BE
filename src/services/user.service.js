@@ -404,23 +404,63 @@ class UsersService {
 
   // ADMIN: Update user
   async updateUserAdmin(id, userData) {
-    const { password, ...updateData } = userData;
+    const { sequelize } = require("@/models");
+    const t = await sequelize.transaction();
 
-    // Hash password if provided
-    if (password && password.trim() !== "") {
-      updateData.password = await hashPassword(password);
+    try {
+      const { password, roleIds, ...updateData } = userData;
+
+      // Hash password if provided
+      if (password && password.trim() !== "") {
+        updateData.password = await hashPassword(password);
+      }
+
+      const [updatedRowsCount] = await User.update(updateData, {
+        where: { id },
+        transaction: t,
+      });
+
+      if (updatedRowsCount === 0) {
+        throw new Error("User not found");
+      }
+
+      const user = await User.findByPk(id, { transaction: t });
+
+      // Update roles if roleIds provided
+      if (roleIds && Array.isArray(roleIds) && roleIds.length > 0) {
+        // Find all roles by IDs
+        const roles = await Role.findAll({
+          where: { id: roleIds, isActive: true },
+          transaction: t,
+        });
+
+        if (roles.length === 0) {
+          throw new Error("No valid roles found");
+        }
+
+        // Set the roles (this will replace existing roles)
+        await user.setRoles(roles, { transaction: t });
+      }
+
+      await t.commit();
+
+      // Return user with roles
+      const updatedUser = await User.findByPk(id, {
+        include: [
+          {
+            model: Role,
+            as: "roles",
+            attributes: ["id", "name", "displayName"],
+            through: { attributes: [] },
+          },
+        ],
+      });
+
+      return updatedUser;
+    } catch (error) {
+      await t.rollback();
+      throw error;
     }
-
-    const [updatedRowsCount] = await User.update(updateData, {
-      where: { id },
-    });
-
-    if (updatedRowsCount === 0) {
-      throw new Error("User not found");
-    }
-
-    const updatedUser = await User.findByPk(id);
-    return updatedUser;
   }
 
   // ADMIN: Delete user
