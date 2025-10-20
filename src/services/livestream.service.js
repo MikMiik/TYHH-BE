@@ -309,6 +309,23 @@ class LivestreamService {
     return true;
   }
 
+  // Bulk delete livestreams
+  async bulkDeleteLivestreams(ids) {
+    // Validate input
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw new Error("IDs array is required and must not be empty");
+    }
+
+    const deletedRowsCount = await Livestream.destroy({
+      where: { id: { [Op.in]: ids } },
+    });
+
+    return {
+      deletedCount: deletedRowsCount,
+      message: `Successfully deleted ${deletedRowsCount} livestream(s)`,
+    };
+  }
+
   /**
    * Get livestreams analytics (admin only)
    */

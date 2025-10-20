@@ -167,6 +167,23 @@ class CourseOutlineService {
     }
   }
 
+  // Bulk delete course outlines
+  async bulkDeleteOutlines(ids) {
+    // Validate input
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw new Error("IDs array is required and must not be empty");
+    }
+
+    const deletedRowsCount = await CourseOutline.destroy({
+      where: { id: { [sequelize.Sequelize.Op.in]: ids } },
+    });
+
+    return {
+      deletedCount: deletedRowsCount,
+      message: `Successfully deleted ${deletedRowsCount} course outline(s)`,
+    };
+  }
+
   // Reorder outlines
   async reorderOutlines(courseId, orders) {
     // Verify course exists

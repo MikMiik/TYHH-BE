@@ -389,6 +389,23 @@ class CourseService {
     return true;
   }
 
+  // ADMIN: Bulk delete courses
+  async bulkDeleteCourses(ids) {
+    // Validate input
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw new Error("IDs array is required and must not be empty");
+    }
+
+    const deletedRowsCount = await Course.destroy({
+      where: { id: { [Op.in]: ids } },
+    });
+
+    return {
+      deletedCount: deletedRowsCount,
+      message: `Successfully deleted ${deletedRowsCount} course(s)`,
+    };
+  }
+
   // ADMIN: Analytics
   async getCoursesAnalytics() {
     const [

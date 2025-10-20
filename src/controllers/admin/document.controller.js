@@ -46,6 +46,12 @@ exports.delete = async (req, res) => {
   res.success(200, null, "Document deleted successfully");
 };
 
+exports.bulkDelete = async (req, res) => {
+  const { ids } = req.body;
+  const result = await documentService.bulkDeleteDocuments(ids);
+  res.success(200, result, result.message);
+};
+
 exports.getAnalytics = async (req, res) => {
   const analytics = await documentService.getDocumentsAnalytics();
   res.success(200, analytics);

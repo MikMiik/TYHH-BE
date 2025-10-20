@@ -481,6 +481,28 @@ class UsersService {
     return true;
   }
 
+  // ADMIN: Bulk delete users
+  async bulkDeleteUsersAdmin(ids, currentUserId) {
+    // Validate input
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw new Error("IDs array is required and must not be empty");
+    }
+
+    // Prevent admin from deleting themselves
+    if (currentUserId && ids.includes(parseInt(currentUserId))) {
+      throw new Error("Cannot delete your own account");
+    }
+
+    const deletedRowsCount = await User.destroy({
+      where: { id: { [Op.in]: ids } },
+    });
+
+    return {
+      deletedCount: deletedRowsCount,
+      message: `Successfully deleted ${deletedRowsCount} user(s)`,
+    };
+  }
+
   // ADMIN: Toggle user status
   async toggleUserStatus(id, activeKey) {
     const [updatedRowsCount] = await User.update(

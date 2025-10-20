@@ -20,6 +20,7 @@ router.delete(
   adminUserValidator.validateId,
   adminUserController.delete
 );
+router.post("/bulk-delete", adminUserController.bulkDelete);
 router.patch(
   "/:id/status",
   adminUserValidator.validateId,

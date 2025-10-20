@@ -13,6 +13,7 @@ router.get("/:id", adminCourseController.getOne);
 router.post("/", courseValidator.create, adminCourseController.create);
 router.put("/:id", courseValidator.update, adminCourseController.update);
 router.delete("/:id", adminCourseController.delete);
+router.post("/bulk-delete", adminCourseController.bulkDelete);
 
 // Course outline management routes (nested under course)
 // GET /admin/courses/:courseId/outlines - Get all outlines for a course

@@ -14,6 +14,7 @@ router.put(
   adminLivestreamController.update
 );
 router.delete("/:id", adminLivestreamController.delete);
+router.post("/bulk-delete", adminLivestreamController.bulkDelete);
 
 // Reorder livestreams within a course outline
 router.put(

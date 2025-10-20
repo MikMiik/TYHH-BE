@@ -56,6 +56,12 @@ exports.delete = async (req, res) => {
   res.success(200, null, "Course outline deleted successfully");
 };
 
+exports.bulkDelete = async (req, res) => {
+  const { ids } = req.body;
+  const result = await courseOutlineService.bulkDeleteOutlines(ids);
+  res.success(200, result, result.message);
+};
+
 exports.reorder = async (req, res) => {
   const { courseId } = req.params;
   const { orders } = req.body;

@@ -51,6 +51,12 @@ exports.delete = async (req, res) => {
   res.success(200, null, "Course deleted successfully");
 };
 
+exports.bulkDelete = async (req, res) => {
+  const { ids } = req.body;
+  const result = await courseService.bulkDeleteCourses(ids);
+  res.success(200, result, result.message);
+};
+
 exports.getAnalytics = async (req, res) => {
   const analytics = await courseService.getCoursesAnalytics();
   res.success(200, analytics);

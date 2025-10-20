@@ -339,6 +339,23 @@ class DocumentService {
     return true;
   }
 
+  // Bulk delete documents
+  async bulkDeleteDocuments(ids) {
+    // Validate input
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw new Error("IDs array is required and must not be empty");
+    }
+
+    const deletedRowsCount = await Document.destroy({
+      where: { id: { [Op.in]: ids } },
+    });
+
+    return {
+      deletedCount: deletedRowsCount,
+      message: `Successfully deleted ${deletedRowsCount} document(s)`,
+    };
+  }
+
   // ADMIN: Analytics
   async getDocumentsAnalytics() {
     const [totalDocuments, vipDocuments, freeDocuments, totalDownloads] =

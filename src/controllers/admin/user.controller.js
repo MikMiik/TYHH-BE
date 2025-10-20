@@ -44,6 +44,12 @@ exports.delete = async (req, res) => {
   res.success(200, null, "User deleted successfully");
 };
 
+exports.bulkDelete = async (req, res) => {
+  const { ids } = req.body;
+  const result = await userService.bulkDeleteUsersAdmin(ids, req.userId);
+  res.success(200, result, result.message);
+};
+
 exports.toggleStatus = async (req, res) => {
   const { activeKey } = req.body;
   const user = await userService.toggleUserStatus(req.params.id, activeKey, {

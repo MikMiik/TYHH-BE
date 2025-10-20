@@ -24,5 +24,6 @@ router.put(
   adminCourseOutlineController.update
 );
 router.delete("/:id", adminCourseOutlineController.delete);
+router.post("/bulk-delete", adminCourseOutlineController.bulkDelete);
 
 module.exports = router;

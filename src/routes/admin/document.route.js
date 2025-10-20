@@ -9,5 +9,6 @@ router.get("/:id", adminDocumentController.getOne);
 router.post("/", adminDocumentController.create);
 router.put("/:id", adminDocumentController.update);
 router.delete("/:id", adminDocumentController.delete);
+router.post("/bulk-delete", adminDocumentController.bulkDelete);
 
 module.exports = router;
