@@ -38,3 +38,19 @@ exports.delete = async (req, res) => {
   await documentService.deleteDocument(req.params.id);
   res.success(200, null, "Document deleted successfully");
 };
+
+// Increment download count for a document (by slug or id)
+exports.incrementDownload = async (req, res) => {
+  try {
+    const identifier = req.params.slug || req.params.id;
+    // Resolve to document to ensure it exists
+    const document = await documentService.getDocumentByIdOrSlug(identifier);
+    if (!document) return res.error(404, "Document not found");
+
+    await documentService.incrementDownloadCount(document.id);
+    res.success(200, { message: "Download counted" });
+  } catch (error) {
+    console.error("Error incrementing download count:", error);
+    res.error(400, error.message || "Failed to increment download count");
+  }
+};
