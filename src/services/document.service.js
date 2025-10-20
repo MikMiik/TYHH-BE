@@ -66,6 +66,7 @@ class DocumentService {
         "vip",
         "thumbnail",
         "createdAt",
+        "isEnrolled",
       ],
     });
 
