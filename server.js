@@ -53,8 +53,8 @@ app.use(
 app.set("trust proxy", true);
 app.use(express.static("public"));
 
-app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.json({ limit: '50gb' })); // Increase limit for large files
+app.use(express.urlencoded({ limit: '50gb', extended: true })); // Increase limit for large files
 app.use(cookieParser());
 app.use(methodOverride("_method"));
 app.use(responseEnhancer);
