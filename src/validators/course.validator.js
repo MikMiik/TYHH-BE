@@ -92,16 +92,6 @@ exports.createCourse = [
         errorMessage: "Trường miễn phí phải là boolean.",
       },
     },
-    status: {
-      notEmpty: {
-        errorMessage: "Trạng thái không được để trống.",
-      },
-      isIn: {
-        options: [["draft", "published"]],
-        errorMessage:
-          "Trạng thái không hợp lệ. Chỉ chấp nhận 'draft' hoặc 'published'.",
-      },
-    },
     topicIds: {
       optional: { options: { nullable: true } },
       custom: {
