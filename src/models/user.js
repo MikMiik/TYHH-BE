@@ -36,6 +36,20 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
         as: "userRoles",
       });
+
+      // Many-to-many: User có nhiều Entity trong playground
+      User.belongsToMany(models.Entity, {
+        through: models.UserPlaygroundEntity,
+        foreignKey: "userId",
+        otherKey: "entityId",
+        as: "playgroundEntities",
+      });
+
+      // Direct association with junction table
+      User.hasMany(models.UserPlaygroundEntity, {
+        foreignKey: "userId",
+        as: "userPlaygroundEntities",
+      });
     }
   }
   User.init(
