@@ -100,7 +100,7 @@ Output:
 - Luôn tuân thủ format và giải thích logic ở 'description'.`,
 
   settings: {
-    temperature: 0.8, // Tăng nhẹ để khuyến khích sự sáng tạo trong logic thực tế
+    temperature: 1.5, // Tăng nhẹ để khuyến khích sự sáng tạo trong logic thực tế
     max_output_tokens: 300,
     model: "gpt-4o-mini", // Có thể cần "gpt-4o" nếu logic suy luận phức tạp hơn
   },
