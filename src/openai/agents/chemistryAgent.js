@@ -11,7 +11,7 @@ const chemistryAgent = {
   "name": "Tên tiếng Việt của sản phẩm",
   "icon": "Emoji phù hợp (💧 🔥 ⚡ 🧊 ☁️ 💨 🌊 🪨 🧱 🌱 Tools...)",
   "formula": "Công thức (nếu là hóa học) HOẶC 'Element1 + Element2' (nếu là khái niệm/logic)",
-  "description": "Giải thích logic thực tế (TẠI SAO) sự kết hợp này tạo ra sản phẩm. Đây là phần quan trọng nhất."
+  "description": "Giải thích logic thực tế (TẠI SAO) sự kết hợp này tạo ra sản phẩm. Đây là phần quan trọng nhất. Viết ngắn gọn, đủ ý, không dài dòng."
 }
 
 🔬 QUY TẮC SUY LUẬN (RẤT QUAN TRỌNG):
