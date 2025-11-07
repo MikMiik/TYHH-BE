@@ -1,5 +1,5 @@
-function generateClientUrl(pathname, query = {}) {
-  const baseUrl = process.env.CLIENT_URL;
+function generateClientUrl(pathname, query = {}, baseUrl) {
+  baseUrl = baseUrl || process.env.CLIENT_URL;
   const url = new URL(
     `${baseUrl.replace(/\/$/, "")}/${pathname.replace(/^\//, "")}`
   );

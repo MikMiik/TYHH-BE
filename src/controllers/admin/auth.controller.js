@@ -1,6 +1,8 @@
 const usersService = require("@/services/user.service");
 const authService = require("@/services/auth.service");
 const cookieManager = require("@/configs/cookie");
+const { verifyMailToken } = require("@/services/jwt.service");
+const buildTokenResponse = require("@/utils/buildTokenResponse");
 
 const adminAuthController = {
   // Admin login - based on API auth login + admin check
@@ -114,6 +116,63 @@ const adminAuthController = {
       // Clear cookies on refresh error
       cookieManager.clearAuthCookies(res);
       res.error(403, error.message);
+    }
+  },
+
+  async sendForgotEmail(req, res) {
+    try {
+      const result = await authService.sendForgotAdminEmail(req.body.email);
+      res.success(200, result);
+    } catch (error) {
+      res.error(500, error.message);
+    }
+  },
+
+  async verifyEmail(req, res) {
+    try {
+      const { token } = req.query;
+      const { userId } = verifyMailToken(token);
+      await usersService.update(userId, {
+        verifiedAt: new Date(),
+      });
+
+      // Generate tokens using buildTokenResponse and set as httpOnly cookies
+      const tokenData = await buildTokenResponse({
+        userId,
+        rememberMe: true, // Email verification implies user wants to stay logged in
+      });
+      cookieManager.setAuthCookies(res, {
+        accessToken: tokenData.accessToken,
+        refreshToken: tokenData.refreshToken,
+        rememberMe: true,
+      });
+
+      return res.success(200, { message: "Email verified successfully" });
+    } catch (error) {
+      res.error(500, error.message);
+    }
+  },
+
+  async verifyResetToken(req, res) {
+    try {
+      const { token } = req.query;
+      const { userId } = verifyMailToken(token);
+      res.success(200, { userId });
+    } catch (error) {
+      res.error(401, error.message);
+    }
+  },
+
+  async resetPassword(req, res) {
+    try {
+      const { token } = req.query;
+      const { userId } = verifyMailToken(token);
+      const result = await usersService.update(userId, {
+        newPassword: req.body.password, // Pass raw password, let service hash it
+      });
+      res.success(200, { message: "Reset password successfully" });
+    } catch (error) {
+      res.error(401, error.message);
     }
   },
 };

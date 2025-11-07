@@ -119,6 +119,34 @@ const sendForgotEmail = async (email) => {
       const resetPasswordUrl = generateClientUrl("reset-password", {
         token: tokenData.token,
       });
+      queue.dispatch("sendForgotPasswordEmailJob", {
+        userId: user.id,
+        email: user.email,
+        token: tokenData.token,
+        resetPasswordUrl,
+      });
+    }
+    return true;
+  } catch (error) {
+    throw new Error(
+      "Failed to send password reset email. Please try again later."
+    );
+  }
+};
+
+const sendForgotAdminEmail = async (email) => {
+  try {
+    const user = await userService.getByEmail(email);
+
+    if (user) {
+      const tokenData = generateMailToken(user.id);
+      const resetPasswordUrl = generateClientUrl(
+        "reset-password",
+        {
+          token: tokenData.token,
+        },
+        process.env.ADMIN_URL
+      );
 
       queue.dispatch("sendForgotPasswordEmailJob", {
         userId: user.id,
@@ -326,6 +354,7 @@ module.exports = {
   refreshAccessToken,
   logout,
   sendForgotEmail,
+  sendForgotAdminEmail,
   changeEmail,
   changePassword,
   googleLogin,
