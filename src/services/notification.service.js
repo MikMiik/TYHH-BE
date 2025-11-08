@@ -140,7 +140,6 @@ class NotificationService {
     }
   }
 
-  // Delete notification (only by teacher who created it)
   async deleteNotification(notificationId, teacherId) {
     try {
       const notification = await Notification.findOne({

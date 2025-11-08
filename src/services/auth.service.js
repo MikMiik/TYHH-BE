@@ -137,8 +137,8 @@ const sendForgotEmail = async (email) => {
 const sendForgotAdminEmail = async (email) => {
   try {
     const user = await userService.getByEmail(email);
-
-    if (user) {
+    const userRoles = await user.getRoles();
+    if (user && userRoles && userRoles.some((role) => role.name === "admin")) {
       const tokenData = generateMailToken(user.id);
       const resetPasswordUrl = generateClientUrl(
         "reset-password",
