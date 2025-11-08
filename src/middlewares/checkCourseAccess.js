@@ -31,7 +31,7 @@ async function checkCourseAccess(req, res, next) {
       include: [
         {
           model: CourseOutline,
-          as: "outline",
+          as: "courseOutline",
           attributes: ["id", "courseId"],
           required: true,
         },
@@ -42,11 +42,11 @@ async function checkCourseAccess(req, res, next) {
       return res.error(404, "Không tìm thấy livestream");
     }
 
-    if (!livestream.outline || !livestream.outline.courseId) {
+    if (!livestream.courseOutline || !livestream.courseOutline.courseId) {
       return res.error(500, "Không thể xác định khóa học của livestream");
     }
 
-    const courseId = livestream.outline.courseId;
+    const courseId = livestream.courseOutline.courseId;
 
     // Check if user is enrolled in the course
     const enrollmentCheck = await paymentService.checkEnrollment(
@@ -55,10 +55,7 @@ async function checkCourseAccess(req, res, next) {
     );
 
     if (!enrollmentCheck.enrolled) {
-      return res.error(
-        403,
-        "Bạn cần đăng ký khóa học này để xem livestream"
-      );
+      return res.error(403, "Bạn cần đăng ký khóa học này để xem livestream");
     }
 
     // User is enrolled, allow access
@@ -74,4 +71,3 @@ async function checkCourseAccess(req, res, next) {
 }
 
 module.exports = checkCourseAccess;
-
