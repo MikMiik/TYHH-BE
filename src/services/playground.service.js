@@ -1,5 +1,5 @@
 const pt = require("periodic-table");
-const { Entity, EntityCombination, UserPlaygroundEntity } = require("@/models");
+const { Entity, EntityCombination, UserPlaygroundEntity, User } = require("@/models");
 const chemistryService = require("@/openai/services/chemistryService");
 const redis = require("@/configs/redis");
 
@@ -100,8 +100,6 @@ class PlaygroundService {
       entity = existingCombination.resultEntity;
     } else {
       // New combination - Call OpenAI API
-    
-      
       console.log(`🔬 New combination: ${element1} + ${element2}`);
       
       // Call OpenAI to get the result
@@ -109,7 +107,19 @@ class PlaygroundService {
         element1,
         element2
       );
-
+      if (openAIResult) {
+        try {
+          if (userId) {
+            console.log(`Adding 1 point to user ${userId} for playground combination`);
+            
+            await User.increment("point", { by: 1, where: { id: userId } });
+            console.log(`➕ Added 1 point to user ${userId} for playground combination`);
+          }
+        } catch (err) {
+          console.error("Error incrementing user point for playground combination:", err);
+          // don't block response on point increment failure
+        }
+      }
       console.log("✨ OpenAI result:", openAIResult);
 
       // Create the new entity
@@ -154,7 +164,7 @@ class PlaygroundService {
         formula: entity.formula,
         description: entity.description,
       },
-      isNew: created, // Indicates if this is newly discovered by the user
+      isNew: !existingCombination ? true : false, // Indicates if this is newly discovered by the user
     };
   }
 
