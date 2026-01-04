@@ -276,9 +276,9 @@ Output (ĐÚNG):
 - **Nếu không rõ ràng** → Sáng tạo dựa trên logic/khái niệm/ứng dụng thực tế`,
 
   settings: {
-    temperature: 0.9, // Giữ 0.9 để tối đa hóa sự sáng tạo
-    max_output_tokens: 300, // Tăng lên 400 để đủ chỗ cho phần giải thích chi tiết
-    model: "gpt-4o-mini", // Có thể cần "gpt-4o" để có logic hóa học chính xác hơn
+    temperature: 0.9,
+    max_output_tokens: 300,
+    model: "gpt-4o-mini",
   },
 };
 
