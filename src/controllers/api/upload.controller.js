@@ -18,29 +18,42 @@ exports.upload = async (req, res) => {
       const originalPath = file.path;
       const tempFixedPath = `${originalPath}-fixed.mp4`;
 
-      // 1. Dùng Promise để bao bọc tiến trình ffmpeg cho tương thích với async/await
-      await new Promise((resolve, reject) => {
-        ffmpeg(originalPath)
-          .outputOptions([
-            "-movflags +faststart",
-            "-acodec copy",
-            "-vcodec copy",
-          ])
-          .on("end", () => {
-            console.log("Tối ưu hóa video thành công!");
-            resolve(); // Báo cho Promise là đã thành công
-          })
-          .on("error", (err) => {
-            console.error("Lỗi khi xử lý ffmpeg:", err.message);
-            reject(err); // Báo cho Promise là đã thất bại
-          })
-          .save(tempFixedPath);
-      });
+      try {
+        // 1. Dùng Promise để bao bọc tiến trình ffmpeg cho tương thích với async/await
+        await new Promise((resolve, reject) => {
+          ffmpeg(originalPath)
+            .outputOptions([
+              "-movflags +faststart",
+              "-acodec copy",
+              "-vcodec copy",
+            ])
+            .on("end", () => {
+              console.log("Tối ưu hóa video thành công!");
+              resolve(); // Báo cho Promise là đã thành công
+            })
+            .on("error", (err) => {
+              console.error("Lỗi khi xử lý ffmpeg:", err.message);
+              reject(err); // Báo cho Promise là đã thất bại
+            })
+            .save(tempFixedPath);
+        });
 
-      // 2. Dọn dẹp: Thay thế file gốc bằng file đã tối ưu
-      await fs.unlink(originalPath); // Xóa file gốc
-      await fs.rename(tempFixedPath, originalPath); // Đổi tên file đã sửa thành tên gốc
-      console.log(`Đã thay thế file gốc bằng file đã tối ưu hóa.`);
+        // 2. Dọn dẹp: Thay thế file gốc bằng file đã tối ưu
+        await fs.unlink(originalPath); // Xóa file gốc
+        await fs.rename(tempFixedPath, originalPath); // Đổi tên file đã sửa thành tên gốc
+        console.log(`Đã thay thế file gốc bằng file đã tối ưu hóa.`);
+      } catch (ffmpegError) {
+        console.warn(
+          "Không thể tối ưu hóa video với ffmpeg (có thể ffmpeg chưa được cài đặt):",
+          ffmpegError.message
+        );
+        console.log("Tiếp tục upload file video gốc mà không tối ưu hóa.");
+        // Dọn dẹp file tạm nếu có
+        if (fsSync.existsSync(tempFixedPath)) {
+          await fs.unlink(tempFixedPath);
+        }
+        // Không reject, tiếp tục với file gốc
+      }
     }
 
     // --- KẾT THÚC LOGIC TỐI ƯU HÓA ---
